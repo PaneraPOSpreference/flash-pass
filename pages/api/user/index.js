@@ -1,5 +1,6 @@
 import connectDB from '../../../middleware/mongodb'
 import {
+  getUserHandler,
   postUserHandler,
   putUserHandler
 } from '../../../controllers/user'
@@ -18,6 +19,8 @@ const userHandler = async (req, res) => {
       return postUserHandler(req, res);
     case "PUT":
       return putUserHandler(req, res);
+    case "GET":
+      return getUserHandler(req, res);
     default:
       return res.status(400).send({ok: false, message: "Request type not supported"})
   }
