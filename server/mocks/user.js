@@ -1,8 +1,5 @@
-import '../styles/globals.css'
-import { useState } from 'react'
-
-export const ordersMock = {
-  name: "John",
+export const mockUserData = {
+  name: "Doe",
   orders: [
     {
       id: 1,
@@ -35,17 +32,3 @@ export const ordersMock = {
     },
   ]
 }
-
-function MyApp({ Component, pageProps }) {
-  const [userData, setUserData] = useState(null)
-
-  return (
-    <Component
-      {...pageProps}
-      userData={userData}
-      setUserData={setUserData}  
-    />
-  )
-}
-
-export default MyApp
