@@ -15,8 +15,8 @@ const ConnectPusher = ({
 
   useEffect(() => {
     // connect pusher
-    const mypusher = new Pusher("70828d56adadbb8fa7cb", { // process.env.NEXT_PUBLIC_PUSHER_APP_KEY
-      cluster: 'us2', // process.env.NEXT_PUBLIC_PUSHER_CLUSTER
+    const mypusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
       encrypted: true,
     })
     console.log('mypusher:', mypusher)

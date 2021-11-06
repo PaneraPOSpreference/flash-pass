@@ -119,13 +119,6 @@ export const putUserHandler = async (req, res) => {
     const foundUser = result[0]
 
     // add account
-    let updateInfo = {
-      name: req.body.name,
-      style: req.body.style || undefined,
-      favorite: req.body.favorite || undefined,
-      history: req.body.history || undefined
-      // ...
-    }
     foundUser.set(req.body)
 
     const newUser = await foundUser.save();
@@ -170,9 +163,16 @@ export const getUserHandler = async (req, res) => {
     console.log("found user data:", result)
     
     if(!result || result.length === 0) {
-      return res.status(404).send({
-        ok: false,
-        message: "No such user found"
+      const User = new UserModel({id: userId});
+      const save_result = await User.save();
+      console.log('result:', save_result)
+      return res.status(201).send({
+        ok: true,
+        message: "Created a new user successfully",
+        data: {
+          id: save_result.id,
+          name: save_result.name
+        }
       })
     }
 
