@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import logo from '../public/logo.svg'
-import { ordersMock } from './_app'
+// import { ordersMock } from './_app'
 
 export default function Home({
   userData,
@@ -21,40 +21,37 @@ export default function Home({
     e.preventDefault()
     console.log(userId)
 
-    console.log(ordersMock)
-
     setLoading(true)
+    setErrors(null)
 
-    // fetch call to POST api at /api/users
-    // fetch('/api/users', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({ userId })
-    // })
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     console.log(data)
+    // fetch call to POST api at /api/user
+    fetch('http://localhost:8000/api/user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ userId })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
 
-    //     if(!data.ok) {
-    //       console.log('there must have been an error:', data.message)
-    //       setErrors(data.message)
-    //       setLoading(false)
-    //       return;
-    //     }
+        if(!data.ok) {
+          console.log('there must have been an error:', data.message)
+          setErrors(data.message)
+          setLoading(false)
+          return;
+        }
 
-    //     setUserData(data.data)
-    //   })
-    //   .catch(err => {
-    //     console.log(err)
-    //     setErrors(err)
-    //   })
-
-    setUserData(ordersMock)
+        setUserData(data.data)
+      })
+      .catch(err => {
+        console.log(err)
+        setErrors(err)
+      })
 
     setLoading(false)
-
   }
 
   const clearUser = () => {
