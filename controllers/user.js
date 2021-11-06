@@ -1,5 +1,6 @@
 import UserModel from '../model/User'
 
+// create/get
 export const postUserHandler = async (req, res) => {
   console.log('user id:', req.body.userId);
 
@@ -49,6 +50,65 @@ export const postUserHandler = async (req, res) => {
   }
 }
 
+// update request
 export const putUserHandler = async (req, res) => {
-  // todo
+  console.log("req.body:", req.body)
+  console.log('userId:', req.body.userId)
+  
+  let userId = req.body.userId;
+
+  // if no userId received
+  if(!userId) {
+    // send error
+    return res.status(400).send({
+      ok: false,
+      message: 'userId is required'
+    });
+  }
+
+  try {
+    const result = await UserModel.find({id: userId});
+
+    console.log("found user data:", result)
+
+    // if result is not found, return error
+    if(!result || result.length === 0) {
+      console.log("No user found")
+      return res.status(404).send({
+        ok: false,
+        message: "No user found",
+        data: {}
+      })
+    }
+
+    const foundUser = result[0]
+
+    // add account
+    let updateInfo = {
+      name: req.body.name,
+      style: req.body.style || undefined,
+      favorite: req.body.favorite || undefined,
+      history: req.body.history || undefined
+      // ...
+    }
+    foundUser.set(req.body)
+
+    const newUser = await foundUser.save();
+
+    console.log("newUser:", newUser)
+
+    return res.status(200).send({
+      ok: true,
+      message: "user updated",
+      data: newUser
+    });
+
+  } catch(error) {
+    console.log("mongoose error:", error);
+
+    return res.status(400).send({
+      ok: false,
+      message: "Error getting user: " + error.message
+    })
+  }
 }
