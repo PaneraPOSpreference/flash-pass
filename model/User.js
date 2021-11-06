@@ -5,8 +5,4 @@ const UserSchema = new mongoose.Schema({
   id: { type: String }
 })
 
-mongoose.models = {}
-
-const UserModel = mongoose.model('Users', UserSchema)
-
-export default UserModel;
+export default mongoose.models.Users || mongoose.model('Users', UserSchema);
