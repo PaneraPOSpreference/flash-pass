@@ -27,7 +27,7 @@ export default function Home({
     setErrors(null)
 
     // fetch call to POST api at /api/user
-    fetch('http://localhost:8000/api/user', {
+    fetch(`/api/user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

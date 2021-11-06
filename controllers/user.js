@@ -1,4 +1,4 @@
-const UserModel = require('../model/User')
+import UserModel from '../model/User'
 
 export const postUserHandler = async (req, res) => {
   console.log('user id:', req.body.userId);
@@ -47,4 +47,8 @@ export const postUserHandler = async (req, res) => {
       message: "Error getting user: " + error.message
     })
   }
+}
+
+export const putUserHandler = async (req, res) => {
+  // todo
 }

@@ -1,15 +1,16 @@
 {
   "name": "flash-pass",
-  "authors": "Nico Stranquist, Eric Stranquist, Jacob Woods",
+  "authors": "Nico Stranquist, Eric Stranquist",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "start:server": "cd ./server && npm run start"
+    "lint": "next lint"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "mongoose": "^6.0.12",
     "next": "12.0.3",
     "react": "17.0.2",
     "react-dom": "17.0.2"
