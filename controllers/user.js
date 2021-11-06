@@ -144,7 +144,7 @@ export const getUserHandler = async (req, res) => {
     return res.status(200).send({
       ok: true,
       message: "user found",
-      data: result[0]
+      data: result[0].data
     });
 
   } catch(error) {
