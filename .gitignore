@@ -36,3 +36,5 @@ server/.env.production.local
 
 # vercel
 .vercel
+/vscode
+.DS_Store
