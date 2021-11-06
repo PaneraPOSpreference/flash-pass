@@ -1,12 +1,10 @@
 import connectDB from '../../../middleware/mongodb'
 import {
-  getUserHandler,
-  postUserHandler,
-  putUserHandler
-} from '../../../controllers/user'
+  getMenuHandler
+} from '../../../controllers/menu'
 import NextCors from 'nextjs-cors'
 
-const userHandler = async (req, res) => {
+const menuHandler = async (req, res) => {
   await NextCors(req, res, {
     // Options
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
@@ -15,15 +13,11 @@ const userHandler = async (req, res) => {
  });
 
   switch(req.method) {
-    case "POST":
-      return postUserHandler(req, res);
-    case "PUT":
-      return putUserHandler(req, res);
     case "GET":
-      return getUserHandler(req, res);
+      return getMenuHandler(req, res);
     default:
       return res.status(400).send({ok: false, message: "Request type not supported"})
   }
 }
 
-export default connectDB(userHandler)
+export default connectDB(menuHandler)
