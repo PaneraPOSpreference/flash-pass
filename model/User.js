@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+// import MenuItem from 'MenuItem'
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, default: "" },
