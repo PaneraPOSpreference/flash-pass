@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import logo from '../public/logo.svg'
-// import { ordersMock } from './_app'
+import ConnectPusher from '../components/ConnectPusher'
 
 const testUserId = "dsfafdf"
 
@@ -38,15 +38,6 @@ export default function Home({
       .then(res => res.json())
       .then(data => {
         console.log(data)
-
-        if(!data.ok) {
-          console.log('there must have been an error:', data.message)
-          setErrors(data.message)
-          setLoading(false)
-          return;
-        }
-
-        setUserData(data.data)
       })
       .catch(err => {
         console.log(err)
@@ -73,6 +64,7 @@ export default function Home({
 
       <main className={styles.main}>
         <h1>Welcome to <Image src={logo} alt="flash pass logo" /> Flash Pass</h1>
+        <ConnectPusher userData={userData} setUserData={setUserData} />
         {userData ? (
           <div>
             <h2>Welcome back, {userData.name || "Anon"}</h2>
