@@ -5,11 +5,13 @@ import styles from '../styles/Home.module.css'
 import logo from '../public/logo.svg'
 // import { ordersMock } from './_app'
 
+const testUserId = "dsfafdf"
+
 export default function Home({
   userData,
   setUserData
 }) {
-  const [userId, setUserId] = useState("")
+  const [userId, setUserId] = useState(testUserId || "")
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState(null)
 

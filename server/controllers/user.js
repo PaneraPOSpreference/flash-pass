@@ -1,6 +1,6 @@
 const UserModel = require('../model/User')
 
-export const postUserHandler = (req, res) => {
+export const postUserHandler = async (req, res) => {
   console.log('user id:', req.body.userId);
 
   let userId = req.body.userId;
@@ -13,21 +13,38 @@ export const postUserHandler = (req, res) => {
     });
   }
 
-  // do something with userId. for now, return mock user data
-  UserModel.find({id: userId}, function(err, result) {
-    if (!err) {
-      console.log("found user data:", result)
-      return res.status(200).send({
+  try {
+    const result = await UserModel.find({id: userId});
+
+    // if result is not found, create one
+
+    console.log("found user data:", result)
+    
+    if(!result || result.length === 0) {
+      const User = new UserModel({id: userId});
+      const save_result = await User.save();
+      console.log('result:', save_result)
+      return res.status(201).send({
         ok: true,
-        message: "userID received",
-        data: result
-      });
-    } else {
-      console.log("mongoose error:", err);
-      return res.status(400).send({
-        ok: false,
-        message: "Cannot find the user information"
+        message: "Created a new user successfully",
+        data: {
+          id: save_result.id
+        }
       })
     }
-  });
+
+    return res.status(200).send({
+      ok: true,
+      message: "userID received",
+      data: result
+    });
+
+  } catch(error) {
+    console.log("mongoose error:", error);
+
+    return res.status(400).send({
+      ok: false,
+      message: "Error getting user: " + error.message
+    })
   }
+}
