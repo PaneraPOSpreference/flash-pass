@@ -2,7 +2,6 @@ import MenuModel from '../model/Menu'
 
 // get menu
 export const getMenuHandler = async (req, res) => {
-  
   try {
     const result = await MenuModel.find({})
 
@@ -32,3 +31,4 @@ export const getMenuHandler = async (req, res) => {
     })
   }
 }
+

@@ -1,6 +1,6 @@
 import UserModel from '../model/User'
 
-// create/get
+// create
 export const postUserHandler = async (req, res) => {
   console.log('user id:', req.body.userId);
 
@@ -101,6 +101,50 @@ export const putUserHandler = async (req, res) => {
       ok: true,
       message: "user updated",
       data: newUser
+    });
+
+  } catch(error) {
+    console.log("mongoose error:", error);
+
+    return res.status(400).send({
+      ok: false,
+      message: "Error getting user: " + error.message
+    })
+  }
+}
+
+// get
+export const getUserHandler = async (req, res) => {
+  console.log('user id:', req.query.userId);
+
+  let userId = req.query.userId;
+
+  if(!userId) {
+    // send error
+    return res.status(400).send({
+      ok: false,
+      message: 'userId is required'
+    });
+  }
+
+  try {
+    const result = await UserModel.find({id: userId});
+
+    // if result is not found, return error message
+
+    console.log("found user data:", result)
+    
+    if(!result || result.length === 0) {
+      return res.status(404).send({
+        ok: false,
+        message: "No such user found"
+      })
+    }
+
+    return res.status(200).send({
+      ok: true,
+      message: "user found",
+      data: result[0]
     });
 
   } catch(error) {
