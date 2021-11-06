@@ -80,12 +80,17 @@ export default function Home({
             <section>
               <p>Your order history:</p>
               <ul>
-                {userData.orders.map(order => (
+                {userData.orders?.map(order => (
                   <li key={order.id}>
                     <p>{order.items.map(item => item.name).join(", ")}</p>
                     <p>{order.total}</p>
                   </li>
                 ))}
+                {(!userData.orders || userData.orders.length == 0) && (
+                  <li>
+                    <p>You have no orders yet!</p>
+                  </li>
+                )}
               </ul>
             </section>
           </div>
