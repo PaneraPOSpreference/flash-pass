@@ -1,5 +1,6 @@
 {
   "name": "flash-pass",
+  "authors": "Nico Stranquist, Eric Stranquist, Jacob Woods",
   "private": true,
   "scripts": {
     "dev": "next dev",
