@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import logo from '../public/logo.svg'
+import ConnectPusher from '../components/ConnectPusher'
 // import { ordersMock } from './_app'
 
 const testUserId = "dsfafdf"
@@ -73,6 +74,7 @@ export default function Home({
 
       <main className={styles.main}>
         <h1>Welcome to <Image src={logo} alt="flash pass logo" /> Flash Pass</h1>
+        <ConnectPusher />
         {userData ? (
           <div>
             <h2>Welcome back, {userData.name || "Anon"}</h2>
