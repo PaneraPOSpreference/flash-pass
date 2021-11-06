@@ -28,7 +28,8 @@ export const postUserHandler = async (req, res) => {
         ok: true,
         message: "Created a new user successfully",
         data: {
-          id: save_result.id
+          ...save_result,
+          id: save_result.id,
         }
       })
     }

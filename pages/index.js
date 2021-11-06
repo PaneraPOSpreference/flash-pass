@@ -27,7 +27,7 @@ export default function Home({
     setErrors(null)
 
     // fetch call to POST api at /api/user
-    fetch('http://localhost:8000/api/user', {
+    fetch(`${process.env.API_URL}/api/user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

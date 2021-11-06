@@ -1,10 +1,9 @@
 import express from "express"
+import { postUserHandler } from "../controllers/user"
 
 const router = express.Router()
 
-// controllers
-import { postUserHandler } from "../controllers/user"
-
+// controller
 router.post("/user", postUserHandler)
 
 module.exports = router
