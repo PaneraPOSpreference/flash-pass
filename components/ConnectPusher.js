@@ -4,11 +4,14 @@ import Pusher from 'pusher-js'
 export const PUSHER_CHANNEL="user-id-channel"
 export const PUSHER_EVENT="get-user-id"
 
-const ConnectPusher = () => {
+const ConnectPusher = ({
+  userData,
+  setUserData
+}) => {
   const [connected, setConnected] = useState(false)
   const [pusher, setPusher] = useState(null)
   const [channel, setChannel] = useState(null)
-  const [pusherData, setPusherData] = useState(null)
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     // connect pusher
@@ -28,7 +31,7 @@ const ConnectPusher = () => {
       setPusher(null)
       setConnected(false)
       setChannel(null)
-      setPusherData(null)
+      setMessage(null)
     }
   }, [])
 
@@ -36,9 +39,8 @@ const ConnectPusher = () => {
     if(channel) {
       channel.bind(PUSHER_EVENT, (data) => {
         console.log(`${PUSHER_EVENT}:`, data)
-        let string_data = JSON.stringify(data)
-        alert(string_data);
-        setPusherData(string_data)
+        setMessage(data.message)
+        setUserData(data.userData)
       })
     }
   }, [channel])
@@ -51,9 +53,18 @@ const ConnectPusher = () => {
 
   return (
     <section>
-      <h4>Pusher</h4>
-      {(connected && pusher && channel) ? <p>Connected to pusher</p> : <p>Not Connected to Pusher</p>}
-      {pusherData && <p>Got pusher data: {pusherData}</p>}
+      <h4>Pusher: {(connected && pusher && channel) ? <span>Connected</span> : <span>Not Connected</span>}</h4>
+      {userData && (
+        <>
+          <p>status: {message}</p>
+
+          <ul>
+            {Object.keys(userData).map((key, index) => (
+              <li key={index}>{key}: {userData[key]}</li>
+            ))}
+          </ul>
+        </>
+      )}
     </section>
   )
 }

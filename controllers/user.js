@@ -22,15 +22,15 @@ export const postUserHandler = async (req, res) => {
   let pusher;
   try {
     pusher = new Pusher({
-      appId: process.env.PUSHER_APP_ID,
-      key: process.env.PUSHER_KEY,
+      appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID,
+      key: process.env.NEXT_PUBLIC_PUSHER_KEY,
       secret: process.env.PUSHER_SECRET,
-      cluster: process.env.PUSHER_CLUSTER,
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
       useTLS: true
     });
-    console.log('pusher:', pusher);
+    if(pusher) console.log('pusher connected successfully');
   } catch (error) {
-    console.log('pusher:', error);
+    console.log('pusher error:', error);
     return res.status(400).send({ok: false, message:"Could not connect Pusher"})
   }
 
@@ -47,8 +47,10 @@ export const postUserHandler = async (req, res) => {
       console.log('result:', save_result)
       // before sending, trigger pusher
       pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
-        message: "hello world",
-        userId: userId
+        message: "Created new user",
+        userData: {
+          userId,
+        }
       });
       return res.status(201).send({
         ok: true,
@@ -61,10 +63,12 @@ export const postUserHandler = async (req, res) => {
 
     // before sending, trigger pusher
     pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
-      message: "hello world",
-      userId: userId
+      message: "Found the user",
+      userData: {
+        userId,
+      }
     });
-    
+
     return res.status(200).send({
       ok: true,
       message: "userID received",
