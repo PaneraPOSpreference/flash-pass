@@ -3,8 +3,8 @@ import express from "express"
 const router = express.Router()
 
 // controllers
-import {user} from "../controllers/user"
+import { postUserHandler } from "../controllers/user"
 
-router.get("/user", user)
+router.post("/user", postUserHandler)
 
 module.exports = router
