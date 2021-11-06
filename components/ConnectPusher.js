@@ -27,6 +27,7 @@ const ConnectPusher = ({
     setConnected(true)
 
     return () => {
+      console.log('unmounting pusher')
       resetPusher()
       setPusher(null)
       setConnected(false)
@@ -36,7 +37,9 @@ const ConnectPusher = ({
   }, [])
 
   useEffect(() => {
-    if(channel) {
+    if(channel && !message) {
+      channel.unbind()
+      pusher.unsubscribe(channel)
       channel.bind(PUSHER_EVENT, (data) => {
         console.log(`${PUSHER_EVENT}:`, data)
         setMessage(data.message)

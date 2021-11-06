@@ -41,17 +41,19 @@ export const postUserHandler = async (req, res) => {
 
     console.log("found user data:", result)
     
+    let pusher_result;
     if(!result || result.length === 0) {
       const User = new UserModel({id: userId});
       const save_result = await User.save();
       console.log('result:', save_result)
       // before sending, trigger pusher
-      pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
+      pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
         message: "Created new user",
         userData: {
           userId,
         }
       });
+      console.log('pusher result:', pusher_result)
       return res.status(201).send({
         ok: true,
         message: "Created a new user successfully",
@@ -62,12 +64,13 @@ export const postUserHandler = async (req, res) => {
     }
 
     // before sending, trigger pusher
-    pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
+    pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
       message: "Found the user",
       userData: {
         userId,
       }
     });
+    console.log('pusher result:', pusher_result)
 
     return res.status(200).send({
       ok: true,
