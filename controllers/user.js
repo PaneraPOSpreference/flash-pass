@@ -1,4 +1,8 @@
 import UserModel from '../model/User'
+import Pusher from "pusher"
+
+const PUSHER_CHANNEL="user-id-channel"
+const PUSHER_EVENT="get-user-id"
 
 // create
 export const postUserHandler = async (req, res) => {
@@ -14,6 +18,22 @@ export const postUserHandler = async (req, res) => {
     });
   }
 
+  // connect pusher
+  let pusher;
+  try {
+    pusher = new Pusher({
+      appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID,
+      key: process.env.NEXT_PUBLIC_PUSHER_KEY,
+      secret: process.env.PUSHER_SECRET,
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+      useTLS: true
+    });
+    if(pusher) console.log('pusher connected successfully');
+  } catch (error) {
+    console.log('pusher error:', error);
+    return res.status(400).send({ok: false, message:"Could not connect Pusher"})
+  }
+
   try {
     const result = await UserModel.find({id: userId});
 
@@ -25,6 +45,13 @@ export const postUserHandler = async (req, res) => {
       const User = new UserModel({id: userId});
       const save_result = await User.save();
       console.log('result:', save_result)
+      // before sending, trigger pusher
+      pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
+        message: "Created new user",
+        userData: {
+          userId,
+        }
+      });
       return res.status(201).send({
         ok: true,
         message: "Created a new user successfully",
@@ -33,6 +60,14 @@ export const postUserHandler = async (req, res) => {
         }
       })
     }
+
+    // before sending, trigger pusher
+    pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
+      message: "Found the user",
+      userData: {
+        userId,
+      }
+    });
 
     return res.status(200).send({
       ok: true,
