@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const MenuSchema = new mongoose.Schema({
+export const MenuSchema = new mongoose.Schema({
   name: { type: String },
   id: { type: String },
   type: [

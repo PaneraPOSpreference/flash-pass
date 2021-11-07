@@ -55,9 +55,7 @@ export const postUserHandler = async (req, res) => {
       return res.status(201).send({
         ok: true,
         message: "Created a new user successfully",
-        data: {
-          id: save_result.id
-        }
+        data: save_result.data.length ? save_result.data[0] : save_result.data
       })
     }
 
@@ -72,7 +70,7 @@ export const postUserHandler = async (req, res) => {
     return res.status(200).send({
       ok: true,
       message: "userID received",
-      data: result
+      data: result.length ? result[0] : result
     });
 
   } catch(error) {
@@ -141,8 +139,56 @@ export const putUserHandler = async (req, res) => {
   }
 }
 
-// get
+// get user
 export const getUserHandler = async (req, res) => {
+  console.log('user id:', req.query.userId);
+
+  let userId = req.query.userId;
+
+  if(!userId) {
+    // send error
+    return res.status(400).send({
+      ok: false,
+      message: 'userId is required'
+    });
+  }
+
+  try {
+    const result = await UserModel.find({id: userId});
+
+    // if result is not found, create new user
+
+    console.log("found user data:", result)
+    
+    if(!result || result.length === 0) {
+      const User = new UserModel({id: userId});
+      const save_result = await User.save();
+      console.log('result:', save_result)
+      return res.status(201).send({
+        ok: true,
+        message: "Created a new user successfully",
+        data: save_result.data
+      })
+    }
+
+    return res.status(200).send({
+      ok: true,
+      message: "user found",
+      data: result[0].data
+    });
+
+  } catch(error) {
+    console.log("mongoose error:", error);
+
+    return res.status(400).send({
+      ok: false,
+      message: "Error getting user: " + error.message
+    })
+  }
+}
+
+// get user preferences
+export const getUserPreferenceHandler = async (req, res) => {
   console.log('user id:', req.query.userId);
 
   let userId = req.query.userId;
@@ -163,23 +209,60 @@ export const getUserHandler = async (req, res) => {
     console.log("found user data:", result)
     
     if(!result || result.length === 0) {
-      const User = new UserModel({id: userId});
-      const save_result = await User.save();
-      console.log('result:', save_result)
-      return res.status(201).send({
-        ok: true,
-        message: "Created a new user successfully",
-        data: {
-          id: save_result.id,
-          name: save_result.name
-        }
+      return res.status(404).send({
+        ok: false,
+        message: "User not found",
       })
     }
 
     return res.status(200).send({
       ok: true,
-      message: "user found",
-      data: result[0].data
+      message: "user found, here are the favorites",
+      data: result[0].favorite
+    });
+
+  } catch(error) {
+    console.log("mongoose error:", error);
+
+    return res.status(400).send({
+      ok: false,
+      message: "Error getting user: " + error.message
+    })
+  }
+}
+
+// get user history
+export const getUserHistoryHandler = async (req, res) => {
+  console.log('user id:', req.query.userId);
+
+  let userId = req.query.userId;
+
+  if(!userId) {
+    // send error
+    return res.status(400).send({
+      ok: false,
+      message: 'userId is required'
+    });
+  }
+
+  try {
+    const result = await UserModel.find({id: userId});
+
+    // if result is not found, return error message
+
+    console.log("found user data:", result)
+    
+    if(!result || result.length === 0) {
+      return res.status(404).send({
+        ok: false,
+        message: "User not found",
+      })
+    }
+
+    return res.status(200).send({
+      ok: true,
+      message: "user found, here is the history",
+      data: result[0].history
     });
 
   } catch(error) {
