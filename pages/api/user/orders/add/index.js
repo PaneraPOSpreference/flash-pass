@@ -1,7 +1,5 @@
 import connectDB from '../../../../../middleware/mongodb'
-import {
-  postUserHistoryHandler
-} from '../../../../../controllers/user'
+import { postUserCartHandler } from '../../../../../controllers/orders'
 import NextCors from 'nextjs-cors'
 
 const userHandler = async (req, res) => {
@@ -14,7 +12,7 @@ const userHandler = async (req, res) => {
 
   switch(req.method) {
     case "POST":
-      return postUserHistoryHandler(req, res);
+      return postUserCartHandler(req, res);
     default:
       return res.status(400).send({ok: false, message: "Request type not supported"})
   }
