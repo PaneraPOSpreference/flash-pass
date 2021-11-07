@@ -25,7 +25,7 @@ export const menuItems = [
     types: ["Lunch", "Dinner"],
     name: "Veggie Flatbread Pizza",
     price: 7.50
-  },
+  }, 
   {
     id: 4,
     category: "Flatbreads",

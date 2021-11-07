@@ -6,6 +6,7 @@ import logo from '../public/logo.svg'
 import ConnectPusher from '../components/ConnectPusher'
 import classNames from "classnames"
 import {menuItems as mockMenuItems} from '../mocks/menu'
+import styled from 'styled-components'
 
 const testUserId = "dsfafdf"
 
@@ -134,9 +135,6 @@ export default function Home({
   const purchaseOrder = () => {
     console.log('purchasing order')
 
-    const orderIds = order.map(item => item.id)
-
-
     setFinishedOrder(true)
     setShowMenu(false)
     setOrder([])
@@ -144,7 +142,7 @@ export default function Home({
     setTimeout(() => {
       setFinishedOrder(false)
       setShowMenu(true)
-    }, 3000)
+    }, 5000)
 
     // send api call
     // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
@@ -214,7 +212,7 @@ export default function Home({
           <input type="checkbox" value={showMenu} onChange={(e) => setShowMenu(e.target.checked)} />
         </p> */}
         {menuItems && menuItems.length && (menuItems.length > 0) && (
-          <section className={classNames({"hidden": !showMenu})} style={{display: 'flex', flexWrap: "wrap", justifyContent: "space-evenly", marginBottom: 15}}>
+          <StyledGrid className={classNames({"hidden": !showMenu})} style={{display: 'flex', flexWrap: "wrap", justifyContent: "space-evenly", marginBottom: 15}}>
             {menuItems.map((menuItem, index) => (
               <div className={classNames("menu-item", { "highlight-item": activeMenuItemId === menuItem.id})} key={`${index}-${menuItem.name}`} style={{flex: 1, minHeight: 80, minWidth: 150, border: "1px solid rgba(0,0,0,0.1)",paddingLeft: 5, paddingRight: 5, margin: 10, cursor: "pointer"}} onClick={() => handleMenuItemClick(menuItem.id)}>
                 <h4 style={{marginTop:0,marginBottom:0,paddingTop:10,paddingBottom:10,textAlign:'center'}}>#{menuItem.id}</h4>
@@ -223,7 +221,7 @@ export default function Home({
                 <p>{menuItem.category}</p>
               </div>
             ))}
-          </section>
+          </StyledGrid>
         )}
 
         {showMenu && activeMenuItemId && (
@@ -237,7 +235,7 @@ export default function Home({
             <h3 style={{textAlign:'center'}}>Your Order:</h3>
             {order.length > 0 && order.map((orderItem, index) => (
               <div className="order-item" key={`${index}-${orderItem.name}`} style={{marginBottom: 8,marginTop:8,borderBottom:"1px solid rgba(33,33,33,.1)", display:'flex',alignItems:'center', paddingLeft: 5, paddingRight: 5}}>
-                <button onClick={() => removeItemFromOrder(orderItem.id)} style={{marginRight:10,marginBottom:0}}>Remove</button>
+                {/* <button onClick={() => removeItemFromOrder(orderItem.id)} style={{marginRight:10,marginBottom:0}}>Remove</button> */}
                 <h4 style={{flex:1,marginBottom:0,marginTop:0}}>#{orderItem.id} - {orderItem.name}</h4>
                 <p style={{marginLeft: 10,marginBottom:0,marginTop:0}}>${orderItem.price.toString()}</p>
               </div>
@@ -273,10 +271,10 @@ export default function Home({
 
         {userData && !finishedOrder && (
           <div>
-            <h2>Welcome back, {userData.name || "Anon"}</h2>
-            <section>
+            {/* <h2>Welcome back, {userData.name || "Anon"}</h2> */}
+            {/* <section>
               <button onClick={clearUser}>Logout</button>
-            </section>
+            </section> */}
             <section>
               <p>Your order history:</p>
               <ul>
@@ -308,3 +306,7 @@ export default function Home({
     </div>
   )
 }
+
+const StyledGrid = styled.section`
+  border: 1px solid rgba(0,0,0,.3);
+`
