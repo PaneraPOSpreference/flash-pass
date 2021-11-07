@@ -62,7 +62,7 @@ export const postUserHandler = async (req, res) => {
           message: "Created new user",
           userData: {
             id:userId,
-            name: "Anon"
+            name: "Anon",
           }
         });
       }
@@ -78,6 +78,8 @@ export const postUserHandler = async (req, res) => {
     }
 
     const foundUser = result[0];
+
+    console.log('found user:', foundUser)
 
     // before sending, trigger pusher
     if(!skipPusher) {
