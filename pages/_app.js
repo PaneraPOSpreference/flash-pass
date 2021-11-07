@@ -37,13 +37,19 @@ export const ordersMock = {
 }
 
 function MyApp({ Component, pageProps }) {
-  const [userData, setUserData] = useState(null)
+  
 
   return (
     <Component
       {...pageProps}
-      userData={userData}
-      setUserData={setUserData}  
+      // userData={userData}
+      // setUserData={setUserData}
+      // menuItems={menuItems}
+      // setMenuItems={setMenuItems}
+      // order={order}
+      // cart={cart}
+      // setCart={setCart}
+      // setOrder={setOrder}
     />
   )
 }

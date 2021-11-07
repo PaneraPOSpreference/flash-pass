@@ -4,14 +4,34 @@ import Pusher from 'pusher-js'
 export const PUSHER_CHANNEL="user-id-channel"
 export const PUSHER_EVENT="get-user-id"
 
+export const PUSHER_CHANNEL_ORDER="user-order-channel"
+export const PUSHER_EVENT_ORDER="user-order-event"
+
+export const PUSHER_CHANNEL_PURCHASE="user-purchase-channel"
+export const PUSHER_EVENT_PURCHASE="user-purchase-event"
+
+
 const ConnectPusher = ({
   userData,
-  setUserData
+  setUserData,
+  order,
+  setOrder,
+  finished,
+  setFinished,
+  purchaseOrder,
+  addItemToOrder,
+  menuItems
 }) => {
   const [connected, setConnected] = useState(false)
   const [pusher, setPusher] = useState(null)
   const [channel, setChannel] = useState(null)
   const [message, setMessage] = useState(null)
+
+  const [orderChannel, setOrderChannel] = useState(null)
+  const [orderMessage, setOrderMessage] = useState(null)
+
+  const [purchaseChannel, setPurchaseChannel] = useState(null)
+  const [purchaseMessage, setPurchaseMessage] = useState(null)
 
   useEffect(() => {
     // connect pusher
@@ -24,6 +44,15 @@ const ConnectPusher = ({
     console.log('mychannel:', mychannel)
     setChannel(mychannel)
     setPusher(mypusher)
+
+    const myorderchannel = mypusher.subscribe(PUSHER_CHANNEL_ORDER)
+    console.log('myorderchannel:', myorderchannel)
+    setOrderChannel(myorderchannel)
+
+    const mypurchasechannel = mypusher.subscribe(PUSHER_CHANNEL_PURCHASE)
+    console.log('mypurchasechannel:', mypurchasechannel)
+    setPurchaseChannel(mypurchasechannel)
+
     setConnected(true)
 
     return () => {
@@ -33,6 +62,10 @@ const ConnectPusher = ({
       setConnected(false)
       setChannel(null)
       setMessage(null)
+      setOrderChannel(null)
+      setOrderMessage(null)
+      setPurchaseChannel(null)
+      setPurchaseMessage(null)
     }
   }, [])
 
@@ -48,25 +81,75 @@ const ConnectPusher = ({
     }
   }, [channel])
 
+  useEffect(() => {
+    if(orderChannel && !orderMessage) {
+      orderChannel.unbind()
+      pusher.unsubscribe(orderChannel)
+      orderChannel.bind(PUSHER_EVENT_ORDER, (data) => {
+        console.log(`${PUSHER_EVENT_ORDER}:`, data)
+        console.log('dsfsdf')
+        setOrderMessage(data.message)
+        console.log(menuItems)
+        addItemToOrder(data.order)
+      })
+    }
+  }, [orderChannel])
+
+  useEffect(() => {
+    if(purchaseChannel && !purchaseMessage) {
+      purchaseChannel.unbind()
+      pusher.unsubscribe(purchaseChannel)
+      purchaseChannel.bind(PUSHER_EVENT_PURCHASE, (data) => {
+        console.log(`${PUSHER_EVENT_PURCHASE}:`, data)
+        setPurchaseMessage(data.message)
+        setFinished(true)
+        purchaseOrder();
+      })
+    }
+  }, [purchaseChannel])
+
   const resetPusher = () => {
-    channel.unbind()
-    pusher.unsubscribe(channel)
-    pusher.disconnect()
+    if(channel) channel.unbind()
+    if(pusher && channel) pusher.unsubscribe(channel)
+
+    if(orderChannel) orderChannel.unbind()
+    if(pusher && orderChannel) pusher.unsubscribe(orderChannel)
+
+    if(purchaseChannel) purchaseChannel.unbind()
+    if(pusher && purchaseChannel) pusher.unsubscribe(purchaseChannel)
+
+    if(pusher) pusher.disconnect()
   }
 
   return (
     <section>
       <h4>Pusher: {(connected && pusher && channel) ? <span>Connected</span> : <span>Not Connected</span>}</h4>
       {userData && (
-        <>
-          <p>status: {message}</p>
+        <div style={{marginBottom: 20}}>
+          <p>user data status: {message}</p>
 
           <ul>
             {Object.keys(userData).map((key, index) => (
               <li key={index}>{key}: {userData[key]}</li>
             ))}
           </ul>
-        </>
+        </div>
+      )}
+      {order && order.length > 0 && (
+        <div style={{marginBottom: 20}}>
+          <p>user&apos;s cart: {orderMessage}</p>
+
+          {/* <ul>
+            {Object.keys(order).map((key, index) => (
+              <li key={index}>{key}: {order[key]}</li>
+            ))}
+          </ul> */}
+        </div>
+      )}
+      {purchaseChannel && (
+        <div>
+          <p>user progress: {finished ? "finished" : "in progress"}</p>
+        </div>
       )}
     </section>
   )

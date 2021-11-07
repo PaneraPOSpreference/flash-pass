@@ -3,6 +3,9 @@ module.exports = {
   env: {
     // PORT:8000,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // async headers() {
   //   return [
   //     {
