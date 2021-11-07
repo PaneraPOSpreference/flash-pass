@@ -18,20 +18,29 @@ export const postUserHandler = async (req, res) => {
     });
   }
 
-  // connect pusher
   let pusher;
-  try {
-    pusher = new Pusher({
-      appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID,
-      key: process.env.NEXT_PUBLIC_PUSHER_KEY,
-      secret: process.env.PUSHER_SECRET,
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-      useTLS: true
-    });
-    if(pusher) console.log('pusher connected successfully');
-  } catch (error) {
-    console.log('pusher error:', error);
-    return res.status(400).send({ok: false, message:"Could not connect Pusher"})
+  let skipPusher = false;
+
+  if(req.body._from && req.body._from === "app") {
+    console.log('skipping pusher')
+    skipPusher = true;
+  }
+
+  if(!skipPusher) {
+    // connect pusher
+    try {
+      pusher = new Pusher({
+        appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID,
+        key: process.env.NEXT_PUBLIC_PUSHER_KEY,
+        secret: process.env.PUSHER_SECRET,
+        cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+        useTLS: true
+      });
+      if(pusher) console.log('pusher connected successfully');
+    } catch (error) {
+      console.log('pusher error:', error);
+      return res.status(400).send({ok: false, message:"Could not connect Pusher"})
+    }
   }
 
   try {
@@ -47,12 +56,14 @@ export const postUserHandler = async (req, res) => {
       const save_result = await User.save();
       console.log('result:', save_result)
       // before sending, trigger pusher
-      pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
-        message: "Created new user",
-        userData: {
-          userId,
-        }
-      });
+      if(!skipPusher) {
+        pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
+          message: "Created new user",
+          userData: {
+            userId,
+          }
+        });
+      }
       console.log('pusher result:', pusher_result)
       return res.status(201).send({
         ok: true,
@@ -64,12 +75,14 @@ export const postUserHandler = async (req, res) => {
     }
 
     // before sending, trigger pusher
-    pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
-      message: "Found the user",
-      userData: {
-        userId,
-      }
-    });
+    if(!skipPusher) {
+      pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
+        message: "Found the user",
+        userData: {
+          userId,
+        }
+      });
+    }
     console.log('pusher result:', pusher_result)
 
     return res.status(200).send({
