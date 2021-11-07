@@ -344,7 +344,7 @@ export const postUserHistoryHandler = async (req, res) => {
         data: [{
           itemId: itemId,
           name: "None",
-          price: 9.99
+          price: "9.99"
         }]
       })
     }
@@ -355,7 +355,7 @@ export const postUserHistoryHandler = async (req, res) => {
       data: [{
         itemId: menuItem[0].id,
         name: menuItem[0].name,
-        price: menuItem[0].price
+        price: menuItem[0].price.toString()
       }]
     });
 
