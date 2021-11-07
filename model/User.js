@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { MenuSchema } from './Menu'
+import { OrderSchema } from './Orders'
 
 const UserSchema = new mongoose.Schema({
   id: { type: String },
@@ -8,14 +9,9 @@ const UserSchema = new mongoose.Schema({
     name: { type: String, default: "" },
     frequent: MenuSchema
   },
-  cart: [String],
+  cart: [ MenuSchema ],
   favorite: [ MenuSchema ],
-  history: [[String]]
-    // {
-    //   menuItem: MenuSchema,
-    //   timestamp: { type: Date, default: Date.now() }
-    // }
-  // ]
+  history: [ OrderSchema ]
 })
 
 export default mongoose.models.Users || mongoose.model('Users', UserSchema);

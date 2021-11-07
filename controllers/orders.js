@@ -1,5 +1,7 @@
 import UserModel from '../model/User'
 import MenuModel from '../model/Menu'
+import OrderModel from '../model/Orders'
+import { menuItems } from '../mocks/menu'
 import Pusher from "pusher"
 
 const PUSHER_CHANNEL_ORDER="user-order-channel"
@@ -9,7 +11,7 @@ const PUSHER_CHANNEL_PURCHASE="user-purchase-channel"
 const PUSHER_EVENT_PURCHASE="user-purchase-event"
 
 // adding new menu item to user.cart
-export const postUserHistoryHandler = async (req, res) => {
+export const postUserCartHandler = async (req, res) => {
   console.log('user ipostCheckoutd:', req.body.userId);
 
   let userId = req.body.userId;
@@ -53,7 +55,6 @@ export const postUserHistoryHandler = async (req, res) => {
     }
 
     const foundUser = result[0]
-
     console.log('found user:', foundUser)
 
     const menuItem = await MenuModel.find({id: Number(itemId)})
@@ -62,10 +63,17 @@ export const postUserHistoryHandler = async (req, res) => {
     let foundCart, newCart, pusher_result;
     if(!menuItem || menuItem.length == 0) {
       foundCart = (Array.isArray(foundUser.cart)) ? foundUser.cart : []
-      newCart = [...foundCart, "3"]
+      newCart = [
+        ...foundCart, 
+        new MenuModel({
+            name:"Broccoli Cheddar Soup Soup",
+            id: 14,
+            type:["Lunch", "Dinner"],
+            category:"Soup",
+            price:"4.5"
+          })
+      ]
       console.log("new cart:", newCart)
-      // foundUser.cart = newCart;
-      // console.log('found user:', foundUser)
 
       UserModel.updateOne(
         {id: userId}, 
@@ -78,19 +86,6 @@ export const postUserHistoryHandler = async (req, res) => {
             }  
             console.log('success updated user times:', numberAffected)
           });   
-        
-
-      // add menu item to foundUser
-      // let data = {
-      //   cart: [...foundCart, "3"] //(!foundUser.cart || !foundUser.cart.length) ? [] : foundUser.cart
-      // }
-      // console.log("data:", data)
-      // // data.cart.push("3")
-      // foundUser.set(data)
-  
-      // let temp_save_user = await foundUser.save();
-  
-      // console.log("updated user:", temp_save_user)
 
       // send event to menu ui
       console.log('triggering event')
@@ -112,7 +107,7 @@ export const postUserHistoryHandler = async (req, res) => {
     }
 
     foundCart = (Array.isArray(foundUser.cart)) ? foundUser.cart : []
-    newCart = [...foundCart, menuItem[0].id]
+    newCart = [...foundCart, menuItem[0]]
     console.log("new cart:", newCart)
 
     UserModel.updateOne(
@@ -127,30 +122,18 @@ export const postUserHistoryHandler = async (req, res) => {
           console.log('success updated user times:', numberAffected)
         });
 
-    // add menuItem.id to foundUser's array of item ids in foundUser.cart
-      // if foundUser.cart is undefined, initialize it with an empty array, then add the id
-    // let data = {
-    //   cart: (!foundUser.cart || !foundUser.length) ? [] : foundUser.cart
-    // }
-    // console.log('menu item:', menuItem)
-    // data.cart.push(menuItem.id)
-    // foundUser.set(data)
-
-    // const newUser = await foundUser.save();
-
-    // console.log("updated user:", newUser)
-
     console.log('triggering event 2')
+
     // send event to menu ui
     pusher_result = await pusher.trigger(PUSHER_CHANNEL_ORDER, PUSHER_EVENT_ORDER, {
       message: "Added item to order",
-      order: menuItem[0].id // array of strings
+      order: menuItem[0] // array of menu items
     });
 
     // send back res
     return res.status(200).send({
       ok: true,
-      message: "user found, here is the history",
+      message: "menu item found, here is the info",
       data: [{
         itemId: menuItem[0].id,
         name: menuItem[0].name,
@@ -206,17 +189,30 @@ export const postCheckoutHandler = async (req, res) => {
     }
 
     const foundUser = result[0]
+    const oldCart = (!foundUser.cart || foundUser.cart.length === 0) ? [] : foundUser.cart
+    const price = (oldCart == []) ? 0 : oldCart.reduce((prev,curr) => (prev+curr),0)
+    console.log("Price:",price)
 
-    const oldCart = foundUser.cart    
-    
-    // update user
-    let data = {
+    let ordersLen = (!foundUser.history || foundUser.history.length === 0) ? 0 : foundUser.history.length
+
+    // create order object to update user history with
+    let newOrder = new OrderModel({
+      items: new MenuModel({...oldCart}),
+      price: price,
+      timestamp: {
+        start: Date.now().toString(),
+        end: Date.now().toString()
+      },
+      id: menuItems.length + ordersLen + 1
+    })
+
+    let ordersList = {
       history: (!foundUser.history || foundUser.history.length === 0) ? [] : foundUser.history
     }
-    data.history.push(oldCart)
+    ordersList.history.push(newOrder)
 
     // save user with new order in history
-    foundUser.set(data)
+    foundUser.set(ordersList)
   
     const newUser = await foundUser.save();
 
@@ -225,12 +221,10 @@ export const postCheckoutHandler = async (req, res) => {
     // clear cart
     // get cart items from user
     console.log('user cart:', foundUser.cart)
-
-    // sent cart items to user
-
+    console.log('order items:', newOrder.items)
 
     // clear cart
-    data = {
+    const data = {
       cart: []
     }
     // update user

@@ -59,7 +59,7 @@ export const postUserHandler = async (req, res) => {
         pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
           message: "Created new user",
           userData: {
-            userId,
+            id:userId,
           }
         });
       }
@@ -79,9 +79,13 @@ export const postUserHandler = async (req, res) => {
       pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
         message: "Found the user",
         userData: {
-          userId,
+          id: userId,
+          name: result.data.name,
+          frequent: result.data.frequent,
+          favs: result.favorite,
+          orders: result.history
         }
-      });
+      })
     }
 
     const output = result.length ? result[0] : result
@@ -204,49 +208,6 @@ export const getUserHandler = async (req, res) => {
       ok: true,
       message: "user found",
       data: result[0].data
-    });
-
-  } catch(error) {
-    console.log("mongoose error:", error);
-
-    return res.status(400).send({
-      ok: false,
-      message: "Error getting user: " + error.message
-    })
-  }
-}
-
-// get user preferences
-export const getUserPreferenceHandler = async (req, res) => {
-  console.log('user id:', req.query.userId);
-
-  let userId = req.query.userId;
-
-  if(!userId) {
-    // send error
-    return res.status(400).send({
-      ok: false,
-      message: 'userId is required'
-    });
-  }
-
-  try {
-    const result = await UserModel.find({id: userId});
-
-    // if result is not found, return error message
-    console.log("found user data:", result)
-    
-    if(!result || result.length === 0) {
-      return res.status(404).send({
-        ok: false,
-        message: "User not found",
-      })
-    }
-
-    return res.status(200).send({
-      ok: true,
-      message: "user found, here are the favorites",
-      data: result[0].favorite
     });
 
   } catch(error) {
