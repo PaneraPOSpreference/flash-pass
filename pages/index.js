@@ -59,39 +59,6 @@ export default function Home({
     console.log('menu items change:', menuItems)
   }, [menuItems])
 
-  const handleChange = e => {
-    setUserId(e.target.value)
-  }
-
-  const handleSubmit = e => {
-    e.preventDefault()
-    console.log(userId)
-
-    setLoading(true)
-    setErrors(null)
-
-    // fetch call to POST api at /api/user
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({ userId })
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data)
-        // setMenuItems(data)
-      })
-      .catch(err => {
-        console.log(err)
-        setErrors(err)
-      })
-
-    setLoading(false)
-  }
-
   const handleMenuItemClick = (menuItemId) => {
     console.log(menuItemId)
     if(activeMenuItemId === menuItemId)
@@ -133,20 +100,22 @@ export default function Home({
     //   })
   }
 
-  const removeItemFromOrder = (itemId) => {
-    console.log('removing item with id:', itemId, 'from order')
-    const newOrder = order.filter(item => item.id !== itemId)
-    setOrder(newOrder)
-  }
+  // const removeItemFromOrder = (itemId) => {
+  //   console.log('removing item with id:', itemId, 'from order')
+  //   const newOrder = order.filter(item => item.id !== itemId)
+  //   setOrder(newOrder)
+  // }
 
   const purchaseOrder = () => {
     console.log('purchasing order')
 
     setFinishedOrder(true)
     setShowMenu(false)
-    setOrder([])
+
+    console.log('order:', order)
 
     setTimeout(() => {
+      setOrder([])
       setFinishedOrder(false)
       setShowMenu(true)
     }, 5000)
@@ -173,20 +142,20 @@ export default function Home({
     //   })
   }
 
-  const orderAgain = () => {
-    setShowMenu(true)
-    setFinishedOrder(false)
-    setActiveMenuItemId(null)
-  }
+  // const orderAgain = () => {
+  //   setShowMenu(true)
+  //   setFinishedOrder(false)
+  //   setActiveMenuItemId(null)
+  // }
 
-  const clearUser = () => {
-    setUserData(null)
-    setLoading(false)
-    setErrors(null)
-    setActiveMenuItemId(null)
-    setUserId("")
-    setFinishedOrder(false)
-  }
+  // const clearUser = () => {
+  //   setUserData(null)
+  //   setLoading(false)
+  //   setErrors(null)
+  //   setActiveMenuItemId(null)
+  //   setUserId("")
+  //   setFinishedOrder(false)
+  // }
 
   return (
     <div className={styles.container}>
@@ -209,19 +178,6 @@ export default function Home({
           addItemToOrder={addItemToOrder}
           menuItems={menuItems}
         />
-
-        {/* <section style={{marginBottom:10}}>
-          {userData ? (
-            <h2>Welcome back, {userData.name || "Anon"}</h2>
-          ) : (
-            <h4 style={{marginTop:0,marginBottom:0}}>Scan the QR Code on our mobile app for the full experience!</h4>
-          )}
-        </section> */}
-
-        {/* <p>
-          <label>Show Menu</label>
-          <input type="checkbox" value={showMenu} onChange={(e) => setShowMenu(e.target.checked)} />
-        </p> */}
         {(!finishedOrder && order) && (
           <StyledMenuLayout>
             <div className="left-col">
@@ -241,28 +197,22 @@ export default function Home({
               </div>
 
               {/* Order Window */}
-              <div style={{marginBottom: 80}}>
-                <h3 style={{textAlign:'center', fontSize:"1.75rem"}}>Your Order:</h3>
-                {order.length > 0 && order.map((orderItem, index) => (
-                  <div className="order-item" key={`${index}-${orderItem.name}`} style={{marginBottom: 8,marginTop:8,borderBottom:"1px solid rgba(33,33,33,.1)", display:'flex',alignItems:'center', paddingLeft: 5, paddingRight: 5}}>
-                    <h4 style={{flex:1,marginBottom:0,marginTop:0}}>#{orderItem.id} - {orderItem.name}</h4>
-                    <p style={{marginLeft: 10,marginBottom:0,marginTop:0}}>${orderItem.price.toString()}</p>
-                  </div>
-                ))}
+              <StyledOrders>
+                <h3 className="orders-header">{userData ? `Welcome back, ${userData.name || "Guest"}` : "Your Order:"}</h3>
+                <ul className="orders-list">
+                  {order.length > 0 && order.map((orderItem, index) => (
+                    <li className="order-item" key={`${index}-${orderItem.name}`}>
+                      <h4 className="order-item-text">#{orderItem.id} - {orderItem.name}</h4>
+                      <p className="order-item-price">${orderItem.price.toString()}</p>
+                    </li>
+                  ))}
+                </ul>
     
-                {order.length > 0 && (
-                  <div style={{display:'flex',justifyContent:'space-between',marginTop:10}}>
-                    <h4 style={{marginBottom:0,marginTop:0}}>Total:</h4>
-                    <h4 style={{marginBottom:0,marginTop:0}}>${order.reduce((acc, curr) => acc + Number(curr.price), 0)}</h4>
-                  </div>
-                )}
-    
-                {order.length > 0 && (
-                  <div style={{textAlign:'center'}}>
-                    <button disabled={!order.length || order.length == 0} onClick={() => purchaseOrder()}>Purchase for ${order.reduce((acc, curr) => acc + Number(curr.price), 0)}</button>
-                  </div>
-                )}
-              </div>
+                <div className="total-container">
+                  <h4 style={{marginBottom:0,marginTop:0, marginRight: 20}}>Total:</h4>
+                  <h4 style={{marginBottom:0,marginTop:0}}>${order.length < 0 ? 0 : order.reduce((acc, curr) => acc + Number(curr.price), 0)}</h4>
+                </div>
+              </StyledOrders>
             </div>
             <div className="right-col">
               <div className="menu-section">
@@ -274,52 +224,14 @@ export default function Home({
                 <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[4]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[4]}`}))} handleMenuItemClick={handleMenuItemClick} />
               </div>
             </div>
-
-            {/* {menuData.categories.map((category, index) => {
-              console.log('category:', category, 'index:', index)
-              if(index === 4) {
-                console.log('category:',category)
-                return (
-                  <div style={{marginBottom: 80}}>
-                    <h3 style={{textAlign:'center'}}>Your Order:</h3>
-                    {order.length > 0 && order.map((orderItem, index) => (
-                      <div className="order-item" key={`${index}-${orderItem.name}`} style={{marginBottom: 8,marginTop:8,borderBottom:"1px solid rgba(33,33,33,.1)", display:'flex',alignItems:'center', paddingLeft: 5, paddingRight: 5}}>
-                        <h4 style={{flex:1,marginBottom:0,marginTop:0}}>#{orderItem.id} - {orderItem.name}</h4>
-                        <p style={{marginLeft: 10,marginBottom:0,marginTop:0}}>${orderItem.price.toString()}</p>
-                      </div>
-                    ))}
-        
-                    {order.length > 0 && (
-                      <div style={{display:'flex',justifyContent:'space-between',marginTop:10}}>
-                        <h4 style={{marginBottom:0,marginTop:0}}>Total:</h4>
-                        <h4 style={{marginBottom:0,marginTop:0}}>${order.reduce((acc, curr) => acc + Number(curr.price), 0)}</h4>
-                      </div>
-                    )}
-        
-                    {order.length > 0 && (
-                      <div style={{textAlign:'center'}}>
-                        <button disabled={!order.length || order.length == 0} onClick={() => purchaseOrder()}>Purchase for ${order.reduce((acc, curr) => acc + Number(curr.price), 0)}</button>
-                      </div>
-                    )}
-                  </div>
-                )
-              }
-              return (
-                
-              )
-            })} */}
           </StyledMenuLayout>
         )}
         
-          
-
         {showMenu && activeMenuItemId && (
           <div style={{cursor: "pointer", marginBottom: 30}}>
             <button onClick={() => addItemToOrder(activeMenuItemId)}>Add {menuItems.find(item => item.id === activeMenuItemId).name} to order for ${menuItems.find(item => item.id === activeMenuItemId).price}</button>
           </div>
         )}
-
-        
 
         {finishedOrder && (
           <section style={{padding: 20, border: "1px solid rgba(0,0,0,.15)", width: "75%", margin: "20px auto", display:'flex', alignItems:'center',justifyContent:'center',marginBottom:40}}>
@@ -329,6 +241,17 @@ export default function Home({
             <div className="item-body" >
               <h2 style={{textAlign:'center'}}>Thanks for shopping with us!</h2>
               <p style={{textAlign:'center'}}>We have added your order to your order history</p>
+              {/* <div className="order-details">
+                <p>Order Details:</p>
+                <ul style={{listStyle:'none'}}>
+                  {order.length > 0 && order.map((orderItem, index) => (
+                    <li className="order-item" key={`${index}-${orderItem.name}`}>
+                      <h4 className="order-item-text">#{orderItem.id} - {orderItem.name}</h4>
+                      <p className="order-item-price">${orderItem.price.toString()}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div> */}
             </div>
           </section>
         )}
@@ -338,37 +261,79 @@ export default function Home({
             
             <section>
               <p>Your order history:</p>
-              <ul>
+              <OrdersHistory>
                 {userData.orders?.map(order => (
                   <li key={order.id}>
                     <p>{order.items.map(item => item.name).join(", ")}</p>
                     <p>{order.total}</p>
                   </li>
                 ))}
-                {(!userData.orders || userData.orders.length == 0) && (
-                  <li>
-                    <p>You have no orders yet!</p>
-                  </li>
-                )}
-              </ul>
+              </OrdersHistory>
             </section>
           </div>
         )}
-         {/* : !finishedOrder && (
-          <form onSubmit={handleSubmit}>
-            {loading && <p>Loading...</p>}
-            {errors && <p style={{color: 'red', opacity: 0.8}}>{errors.toString()}</p>}
-            <label htmlFor="user-id">User ID</label>
-            <input id="user-id" name="user-id" type="text" required value={userId} onChange={handleChange} />
-            <button type="submit" disabled={loading}>Submit</button>
-          </form>
-        )} */}
       </main>
     </div>
   )
 }
 
 
+const StyledOrders = styled.section`
+  padding: 0px;
+  margin: 0px 20px;
+  padding-left: 10%;
+  padding-right: 10%;
+
+  .orders-header {
+    text-align:center;
+    font-size:1.75rem;
+  }
+  .orders-list {
+    list-style: none;
+    padding: 0px;
+  }
+  .order-item {
+    margin-bottom: 8px;
+    margin-top:8px;
+    border-bottom:1px solid rgba(33,33,33,.1);
+    display:flex;
+    align-items:center;
+    padding: 10px 5px;
+  }
+  .order-item-text {
+    flex:1;
+    margin-bottom:0px;
+    margin-top:0px;
+  }
+  .order-item-price {
+    margin-left: 10px;
+    margin-bottom:0px;
+    margin-top:0px;
+  }
+
+  .total-container {
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    text-align: center;
+    margin-top:40px;
+
+    h4 {
+      font-size: 1.35rem;
+    }
+  }
+
+  @media(max-width: 768px) {
+    padding: 0px;
+    margin: 0px 10px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+`
+const OrdersHistory = styled.ul`
+  list-style: none;
+  padding: 0px;
+`
 const StyledMenuLayout = styled.div`
   width: 100%;
   padding-left: 10px;
@@ -431,13 +396,13 @@ const StyledMenuLayout = styled.div`
 
   .menu-section {
     /* height: 4rem; */
-    margin: 0 auto;
+    margin: 0px auto;
 
     .menu-section-header {
       font-family: 'panera';
       font-size: 1.75rem;
       font-weight: 500;
-      margin-bottom: 15px;
+      margin-bottom: 25px;
       text-align: center;
     }
   }

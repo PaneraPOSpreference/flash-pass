@@ -34,9 +34,10 @@ const StyledGrid = styled.div`
       .top-menu-id {
         margin-top: 0px;
         margin-bottom: 0px;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
         text-align: center;
+        font-size: 1.5rem;
       }
     }
     .bottom-menu-item {
