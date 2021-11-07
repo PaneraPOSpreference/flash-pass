@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
+// import classNames from "classnames"
+import styled from 'styled-components'
 import styles from '../styles/Home.module.css'
 import logo from '../public/logo.svg'
 import ConnectPusher from '../components/ConnectPusher'
-import classNames from "classnames"
-import {menuItems as mockMenuItems} from '../mocks/menu'
+import {menuItems as mockMenuItems, menu as menuData} from '../mocks/menu'
+import { ItemsGridSection } from '../components/ItemsGridSection'
+import colors from '../styles/colors'
 
 const testUserId = "dsfafdf"
 
@@ -31,6 +34,8 @@ export default function Home({
   const [showMenu, setShowMenu] = useState(true)
   const [finishedOrder, setFinishedOrder] = useState(false)
 
+  // let categories = menuData.categories;
+
   useEffect(() => {
     // if(!menuItems || menuItems.length === 0) {
     // fetch menuItems
@@ -45,44 +50,14 @@ export default function Home({
     //     setErrors(err)
     //   })
     // }
+    // insert "order" into 4th position of categories
+    // let nextCategories = categories.splice(3, 0, "order")
+    // console.log('nextCategories:', nextCategories, 'categories:', categories)
   }, [])
 
   useEffect(() => {
     console.log('menu items change:', menuItems)
   }, [menuItems])
-
-  const handleChange = e => {
-    setUserId(e.target.value)
-  }
-
-  const handleSubmit = e => {
-    e.preventDefault()
-    console.log(userId)
-
-    setLoading(true)
-    setErrors(null)
-
-    // fetch call to POST api at /api/user
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({ userId })
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data)
-        // setMenuItems(data)
-      })
-      .catch(err => {
-        console.log(err)
-        setErrors(err)
-      })
-
-    setLoading(false)
-  }
 
   const handleMenuItemClick = (menuItemId) => {
     console.log(menuItemId)
@@ -125,26 +100,25 @@ export default function Home({
     //   })
   }
 
-  const removeItemFromOrder = (itemId) => {
-    console.log('removing item with id:', itemId, 'from order')
-    const newOrder = order.filter(item => item.id !== itemId)
-    setOrder(newOrder)
-  }
+  // const removeItemFromOrder = (itemId) => {
+  //   console.log('removing item with id:', itemId, 'from order')
+  //   const newOrder = order.filter(item => item.id !== itemId)
+  //   setOrder(newOrder)
+  // }
 
   const purchaseOrder = () => {
     console.log('purchasing order')
 
-    const orderIds = order.map(item => item.id)
-
-
     setFinishedOrder(true)
     setShowMenu(false)
-    setOrder([])
+
+    console.log('order:', order)
 
     setTimeout(() => {
+      setOrder([])
       setFinishedOrder(false)
       setShowMenu(true)
-    }, 3000)
+    }, 5000)
 
     // send api call
     // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
@@ -168,31 +142,31 @@ export default function Home({
     //   })
   }
 
-  const orderAgain = () => {
-    setShowMenu(true)
-    setFinishedOrder(false)
-    setActiveMenuItemId(null)
-  }
+  // const orderAgain = () => {
+  //   setShowMenu(true)
+  //   setFinishedOrder(false)
+  //   setActiveMenuItemId(null)
+  // }
 
-  const clearUser = () => {
-    setUserData(null)
-    setLoading(false)
-    setErrors(null)
-    setActiveMenuItemId(null)
-    setUserId("")
-    setFinishedOrder(false)
-  }
+  // const clearUser = () => {
+  //   setUserData(null)
+  //   setLoading(false)
+  //   setErrors(null)
+  //   setActiveMenuItemId(null)
+  //   setUserId("")
+  //   setFinishedOrder(false)
+  // }
 
   return (
     <div className={styles.container}>
       <Head>
-        <title>Flash Pass | Tiger Hacks 2021</title>
-        <meta name="description" content="Order your favorite panera items more easily than ever!" />
+        <title>Bread Pass | Tiger Hacks 2021</title>
+        <meta name="description" content="Order your favorite Panera items more easily than ever!" />
         <link rel="icon" href="/logo.svg" />
       </Head>
 
-      <main className={styles.main}>
-        <h1><Image src={logo} alt="flash pass logo" height={32} width={32} /> Bread Pass</h1>
+      <main className={styles.main} style={{position: 'relative'}}>
+        <h1 className="title-text"><Image src={logo} alt="flash pass logo" height={32} width={32} /> Bread Pass</h1>
         <ConnectPusher
           userData={userData}
           setUserData={setUserData}
@@ -204,57 +178,58 @@ export default function Home({
           addItemToOrder={addItemToOrder}
           menuItems={menuItems}
         />
-
-        <section style={{marginBottom:10}}>
-          <h4>Scan the QR Code on your phone for the full experience!</h4>
-        </section>
-
-        {/* <p>
-          <label>Show Menu</label>
-          <input type="checkbox" value={showMenu} onChange={(e) => setShowMenu(e.target.checked)} />
-        </p> */}
-        {menuItems && menuItems.length && (menuItems.length > 0) && (
-          <section className={classNames({"hidden": !showMenu})} style={{display: 'flex', flexWrap: "wrap", justifyContent: "space-evenly", marginBottom: 15}}>
-            {menuItems.map((menuItem, index) => (
-              <div className={classNames("menu-item", { "highlight-item": activeMenuItemId === menuItem.id})} key={`${index}-${menuItem.name}`} style={{flex: 1, minHeight: 80, minWidth: 150, border: "1px solid rgba(0,0,0,0.1)",paddingLeft: 5, paddingRight: 5, margin: 10, cursor: "pointer"}} onClick={() => handleMenuItemClick(menuItem.id)}>
-                <h4 style={{marginTop:0,marginBottom:0,paddingTop:10,paddingBottom:10,textAlign:'center'}}>#{menuItem.id}</h4>
-                <h5>{menuItem.name} - ${menuItem.price}</h5>
-                <p>{menuItem.types.map((t, t_index) => <span key={`${t}-${t_index}`}>{t}, </span>)}</p>
-                <p>{menuItem.category}</p>
+        {(!finishedOrder && order) && (
+          <StyledMenuLayout>
+            <div className="left-col">
+              <div className="menu-section">
+                <h4 className="menu-section-header fancy"><span>{menuData.categories[1]}</span></h4>
+                <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[1]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[1]}`}))} handleMenuItemClick={handleMenuItemClick} />
               </div>
-            ))}
-          </section>
-        )}
+              <div className="menu-section">
+                <h4 className="menu-section-header fancy"><span>{menuData.categories[2]}</span></h4>
+                <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[2]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[2]}`}))} handleMenuItemClick={handleMenuItemClick} />
+              </div>
+            </div>
+            <div className="mid-col">
+              <div className="menu-section">
+                <h4 className="menu-section-header fancy fancy-2"><span>{menuData.categories[0]}</span></h4>
+                <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[0]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[0]}`}))} handleMenuItemClick={handleMenuItemClick} />
+              </div>
 
+              {/* Order Window */}
+              <StyledOrders>
+                <h3 className="orders-header">{userData ? `Welcome back, ${userData.name || "Guest"}` : "Your Order:"}</h3>
+                <ul className="orders-list">
+                  {order.length > 0 && order.map((orderItem, index) => (
+                    <li className="order-item" key={`${index}-${orderItem.name}`}>
+                      <h4 className="order-item-text">#{orderItem.id} - {orderItem.name}</h4>
+                      <p className="order-item-price">${orderItem.price.toString()}</p>
+                    </li>
+                  ))}
+                </ul>
+    
+                <div className="total-container">
+                  <h4 style={{marginBottom:0,marginTop:0, marginRight: 20}}>Total:</h4>
+                  <h4 style={{marginBottom:0,marginTop:0}}>${order.length < 0 ? 0 : order.reduce((acc, curr) => acc + Number(curr.price), 0)}</h4>
+                </div>
+              </StyledOrders>
+            </div>
+            <div className="right-col">
+              <div className="menu-section">
+                <h4 className="menu-section-header fancy"><span>{menuData.categories[3]}</span></h4>
+                <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[3]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[3]}`}))} handleMenuItemClick={handleMenuItemClick} />
+              </div>
+              <div className="menu-section">
+                <h4 className="menu-section-header fancy"><span>{menuData.categories[4]}</span></h4>
+                <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[4]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[4]}`}))} handleMenuItemClick={handleMenuItemClick} />
+              </div>
+            </div>
+          </StyledMenuLayout>
+        )}
+        
         {showMenu && activeMenuItemId && (
           <div style={{cursor: "pointer", marginBottom: 30}}>
             <button onClick={() => addItemToOrder(activeMenuItemId)}>Add {menuItems.find(item => item.id === activeMenuItemId).name} to order for ${menuItems.find(item => item.id === activeMenuItemId).price}</button>
-          </div>
-        )}
-
-        {!finishedOrder && order && (
-          <div style={{width:"50%", margin: "0 auto", marginBottom: 80}}>
-            <h3 style={{textAlign:'center'}}>Your Order:</h3>
-            {order.length > 0 && order.map((orderItem, index) => (
-              <div className="order-item" key={`${index}-${orderItem.name}`} style={{marginBottom: 8,marginTop:8,borderBottom:"1px solid rgba(33,33,33,.1)", display:'flex',alignItems:'center', paddingLeft: 5, paddingRight: 5}}>
-                <button onClick={() => removeItemFromOrder(orderItem.id)} style={{marginRight:10,marginBottom:0}}>Remove</button>
-                <h4 style={{flex:1,marginBottom:0,marginTop:0}}>#{orderItem.id} - {orderItem.name}</h4>
-                <p style={{marginLeft: 10,marginBottom:0,marginTop:0}}>${orderItem.price.toString()}</p>
-              </div>
-            ))}
-
-            {order.length > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between',marginTop:10}}>
-                <h4 style={{marginBottom:0,marginTop:0}}>Total:</h4>
-                <h4 style={{marginBottom:0,marginTop:0}}>${order.reduce((acc, curr) => acc + Number(curr.price), 0)}</h4>
-              </div>
-            )}
-
-            {order.length > 0 && (
-              <div style={{textAlign:'center'}}>
-                <button disabled={!order.length || order.length == 0} onClick={() => purchaseOrder()}>Purchase for ${order.reduce((acc, curr) => acc + Number(curr.price), 0)}</button>
-              </div>
-            )}
           </div>
         )}
 
@@ -266,45 +241,185 @@ export default function Home({
             <div className="item-body" >
               <h2 style={{textAlign:'center'}}>Thanks for shopping with us!</h2>
               <p style={{textAlign:'center'}}>We have added your order to your order history</p>
-              {/* <button style={{textAlign:'center',display:'block',margin:"0 auto"}} onClick={() => orderAgain()}>Order Again</button> */}
+              {/* <div className="order-details">
+                <p>Order Details:</p>
+                <ul style={{listStyle:'none'}}>
+                  {order.length > 0 && order.map((orderItem, index) => (
+                    <li className="order-item" key={`${index}-${orderItem.name}`}>
+                      <h4 className="order-item-text">#{orderItem.id} - {orderItem.name}</h4>
+                      <p className="order-item-price">${orderItem.price.toString()}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div> */}
             </div>
           </section>
         )}
 
         {userData && !finishedOrder && (
           <div>
-            <h2>Welcome back, {userData.name || "Anon"}</h2>
-            <section>
-              <button onClick={clearUser}>Logout</button>
-            </section>
+            
             <section>
               <p>Your order history:</p>
-              <ul>
+              <OrdersHistory>
                 {userData.orders?.map(order => (
                   <li key={order.id}>
                     <p>{order.items.map(item => item.name).join(", ")}</p>
                     <p>{order.total}</p>
                   </li>
                 ))}
-                {(!userData.orders || userData.orders.length == 0) && (
-                  <li>
-                    <p>You have no orders yet!</p>
-                  </li>
-                )}
-              </ul>
+              </OrdersHistory>
             </section>
           </div>
         )}
-         {/* : !finishedOrder && (
-          <form onSubmit={handleSubmit}>
-            {loading && <p>Loading...</p>}
-            {errors && <p style={{color: 'red', opacity: 0.8}}>{errors.toString()}</p>}
-            <label htmlFor="user-id">User ID</label>
-            <input id="user-id" name="user-id" type="text" required value={userId} onChange={handleChange} />
-            <button type="submit" disabled={loading}>Submit</button>
-          </form>
-        )} */}
       </main>
     </div>
   )
 }
+
+
+const StyledOrders = styled.section`
+  padding: 0px;
+  margin: 0px 20px;
+  padding-left: 10%;
+  padding-right: 10%;
+
+  .orders-header {
+    text-align:center;
+    font-size:1.75rem;
+  }
+  .orders-list {
+    list-style: none;
+    padding: 0px;
+  }
+  .order-item {
+    margin-bottom: 8px;
+    margin-top:8px;
+    border-bottom:1px solid rgba(33,33,33,.1);
+    display:flex;
+    align-items:center;
+    padding: 10px 5px;
+  }
+  .order-item-text {
+    flex:1;
+    margin-bottom:0px;
+    margin-top:0px;
+  }
+  .order-item-price {
+    margin-left: 10px;
+    margin-bottom:0px;
+    margin-top:0px;
+  }
+
+  .total-container {
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    text-align: center;
+    margin-top:40px;
+
+    h4 {
+      font-size: 1.35rem;
+    }
+  }
+
+  @media(max-width: 768px) {
+    padding: 0px;
+    margin: 0px 10px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+`
+const OrdersHistory = styled.ul`
+  list-style: none;
+  padding: 0px;
+`
+const StyledMenuLayout = styled.div`
+  width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  // grid logic
+  /* max-width: 1200px; */
+  /* margin: 0 auto; */
+  /* display: grid; */
+  /* grid-gap: 1rem; */
+  /* grid-template-columns: 1fr 1fr 1fr; */
+  /* grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); */
+
+  .fancy {
+    line-height: 0.5;
+    text-align: center;
+  }
+  .fancy span {
+    display: inline-block;
+    position: relative;  
+  }
+  .fancy span:before,
+  .fancy span:after {
+    content: "";
+    position: absolute;
+    /* height: 5px; */
+    border-bottom: 1px solid ${colors.green};
+    border-top: 1px solid ${colors.green};
+    top: 0;
+    width: 50%; // calc((100vw - 20px) / 8);
+  }
+  .fancy span:before {
+    right: 100%;
+    margin-right: 15px;
+  }
+  .fancy span:after {
+    left: 100%;
+    margin-left: 15px;
+  }
+
+  .left-col {
+    width: 25%;
+    float: left;
+  }
+  .menu-section .styled-grid {
+    justify-content: center !important;
+  }
+  .mid-col {
+    width: 50%;
+    float: left;
+
+    .menu-section {
+      margin-bottom: 40px;
+    }
+  }
+  .right-col {
+    width: 25%;
+    float: right;
+  }
+
+  .menu-section {
+    /* height: 4rem; */
+    margin: 0px auto;
+
+    .menu-section-header {
+      font-family: 'panera';
+      font-size: 1.75rem;
+      font-weight: 500;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+  }
+
+  @media (min-width: 300px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+`

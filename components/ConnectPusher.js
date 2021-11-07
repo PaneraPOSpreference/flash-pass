@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Pusher from 'pusher-js'
+import colors from '../styles/colors'
 
 export const PUSHER_CHANNEL="user-id-channel"
 export const PUSHER_EVENT="get-user-id"
@@ -122,11 +123,11 @@ const ConnectPusher = ({
   }
 
   return (
-    <section>
+    <section style={{position:'absolute', top: 0, right: 0}}>
       {purchaseChannel && (
-        <div>
-          <p style={{textAlign:'center',marginBottom:0,marginTop:0}}><small style={{textDecoration:"underline"}}>status</small></p>
-          <p style={{marginTop:8}}>{finished ? "Order finished" : "Order in progress"}</p>
+        <div style={{opacity:0.8, paddingRight: 15, paddingTop: 10}}>
+          {/* <p style={{textAlign:'center',marginBottom:0,marginTop:0,color:colors.gray}}></p> */}
+          <p style={{marginTop:"1rem",color:colors.gray,fontWeight:400}}>{finished ? "Order finished" : userData ? "Order in progress" : "Scan QR Code"}</p>
         </div>
       )}
     </section>
