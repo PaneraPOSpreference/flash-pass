@@ -8,13 +8,14 @@ const UserSchema = new mongoose.Schema({
     name: { type: String, default: "" },
     frequent: MenuSchema
   },
+  cart: [String],
   favorite: [ MenuSchema ],
-  history: [
-    {
-      menuItem: MenuSchema,
-      timestamp: { type: Date, default: Date.now() }
-    }
-  ]
+  history: [[String]]
+    // {
+    //   menuItem: MenuSchema,
+    //   timestamp: { type: Date, default: Date.now() }
+    // }
+  // ]
 })
 
 export default mongoose.models.Users || mongoose.model('Users', UserSchema);
