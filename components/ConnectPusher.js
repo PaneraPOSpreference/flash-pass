@@ -127,7 +127,7 @@ const ConnectPusher = ({
       {purchaseChannel && (
         <div style={{opacity:0.8, paddingRight: 15, paddingTop: 10}}>
           {/* <p style={{textAlign:'center',marginBottom:0,marginTop:0,color:colors.gray}}></p> */}
-          <p style={{marginTop:"1rem",color:colors.gray,fontWeight:400}}>{finished ? "Order finished" : userData ? "Order in progress" : "Scan QR Code"}</p>
+          <p style={{marginTop:"1rem",color:colors.gray,fontWeight:400}}>{finished ? `Order finished: ${userData.name || "Guest"}` : userData ? `Order in progress: ${userData.name || "Guest"}` : "Scan QR Code"}</p>
         </div>
       )}
     </section>
