@@ -211,6 +211,8 @@ export const postCheckoutHandler = async (req, res) => {
     }
     ordersList.history.push(newOrder)
 
+    console.log('orders list:', ordersList)
+
     // save user with new order in history
     foundUser.set(ordersList)
   
