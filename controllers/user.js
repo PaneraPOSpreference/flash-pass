@@ -1,4 +1,6 @@
 import UserModel from '../model/User'
+import OrderModel from '../model/Orders'
+import {menuItems} from '../mocks/menu'
 import Pusher from "pusher"
 
 const PUSHER_CHANNEL="user-id-channel"
@@ -80,8 +82,8 @@ export const postUserHandler = async (req, res) => {
         message: "Found the user",
         userData: {
           id: userId,
-          name: result.data.name,
-          frequent: result.data.frequent,
+          name: result.data?.name || result.name,
+          frequent: result.data?.frequent || result.frequent,
           favs: result.favorite,
           orders: result.history
         }
@@ -90,6 +92,30 @@ export const postUserHandler = async (req, res) => {
 
     const output = result.length ? result[0] : result
     console.log("output:",output)
+
+    const foundUser = result[0]
+    let ordersLen = (!foundUser.history || foundUser.history.length === 0) ? 0 : foundUser.history.length
+
+    // create order object to update user history with
+    let newOrder = new OrderModel({
+      items: [],
+      price: 0,
+      timestamp: {
+        start: new Date(Date.now()),
+        end: new Date(Date.now())
+      },
+      id: menuItems.length + ordersLen + 1
+    })
+
+    let ordersList = {
+      history: (!foundUser.history || foundUser.history.length === 0) ? [] : foundUser.history
+    }
+    ordersList.history.push(newOrder)
+
+    // save user with new order in history
+    foundUser.set(ordersList)
+
+
     return res.status(200).send({
       ok: true,
       message: "userID received",
