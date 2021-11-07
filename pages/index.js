@@ -5,17 +5,25 @@ import styles from '../styles/Home.module.css'
 import logo from '../public/logo.svg'
 import ConnectPusher from '../components/ConnectPusher'
 import classNames from "classnames"
+import {menuItems as mockMenuItems} from '../mocks/menu'
 
 const testUserId = "dsfafdf"
 
 export default function Home({
-  userData,
-  setUserData,
-  menuItems,
-  setMenuItems,
-  order,
-  setOrder
+  // userData,
+  // setUserData,
+  // menuItems,
+  // setMenuItems,
+  // order,
+  // setOrder,
+  // cart,
+  // setCart
 }) {
+  const [userData, setUserData] = useState(null)
+  const [menuItems, setMenuItems] = useState(mockMenuItems)
+  const [order, setOrder] = useState([])
+  const [cart, setCart] = useState([])
+
   const [userId, setUserId] = useState(testUserId || "")
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState(null)
@@ -24,18 +32,24 @@ export default function Home({
   const [finishedOrder, setFinishedOrder] = useState(false)
 
   useEffect(() => {
+    // if(!menuItems || menuItems.length === 0) {
     // fetch menuItems
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/menu`)
-      .then(res => res.json())
-      .then(data => {
-        console.log('data:', data)
-        setMenuItems(data.data)
-      })
-      .catch(err => {
-        console.log('err:', err)
-        setErrors(err)
-      })
+    // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/menu`)
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     console.log('data:', data)
+    //     setMenuItems(data.data)
+    //   })
+    //   .catch(err => {
+    //     console.log('err:', err)
+    //     setErrors(err)
+    //   })
+    // }
   }, [])
+
+  useEffect(() => {
+    console.log('menu items change:', menuItems)
+  }, [menuItems])
 
   const handleChange = e => {
     setUserId(e.target.value)
@@ -81,10 +95,13 @@ export default function Home({
   const addItemToOrder = (itemId) => {
     console.log('adding item with id:', itemId, 'to order')
 
-
-
+    console.log('prev order:', order)
+    console.log('menu items:', menuItems)
     const item = menuItems.find(item => item.id === itemId)
-    setOrder([...order, item])
+    console.log('order item:', item)
+    setOrder(prevOrder => ([...prevOrder, item]))
+
+    console.log('next order:', order)
 
     // api call
     // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/orders/add`, {
@@ -125,25 +142,25 @@ export default function Home({
     setOrder([])
 
     // send api call
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        userId,
-        order: orderIds // string of ids
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log('purchased order data:', data)
-      })
-      .catch(err => {
-        console.log(err)
-        setErrors(err)
-      })
+    // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
+    //   method: "POST",
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Accept': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     userId,
+    //     order: orderIds // string of ids
+    //   })
+    // })
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     console.log('purchased order data:', data)
+    //   })
+    //   .catch(err => {
+    //     console.log(err)
+    //     setErrors(err)
+    //   })
   }
 
   const orderAgain = () => {
@@ -176,6 +193,11 @@ export default function Home({
           setUserData={setUserData}
           order={order}
           setOrder={setOrder}
+          finished={finishedOrder}
+          setFinished={setFinishedOrder}
+          purchaseOrder={purchaseOrder}
+          addItemToOrder={addItemToOrder}
+          menuItems={menuItems}
         />
         <p>
           <label>Show Menu</label>
@@ -207,7 +229,7 @@ export default function Home({
               <div className="order-item" key={`${index}-${orderItem.name}`} style={{marginBottom: 8,marginTop:8,borderBottom:"1px solid rgba(33,33,33,.1)", display:'flex',alignItems:'center', paddingLeft: 5, paddingRight: 5}}>
                 <button onClick={() => removeItemFromOrder(orderItem.id)} style={{marginRight:10,marginBottom:0}}>Remove</button>
                 <h4 style={{flex:1,marginBottom:0,marginTop:0}}>#{orderItem.id} - {orderItem.name}</h4>
-                <p style={{marginLeft: 10,marginBottom:0,marginTop:0}}>${orderItem.price}</p>
+                <p style={{marginLeft: 10,marginBottom:0,marginTop:0}}>${orderItem.price.toString()}</p>
               </div>
             ))}
 

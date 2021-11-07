@@ -7,12 +7,20 @@ export const PUSHER_EVENT="get-user-id"
 export const PUSHER_CHANNEL_ORDER="user-order-channel"
 export const PUSHER_EVENT_ORDER="user-order-event"
 
+export const PUSHER_CHANNEL_PURCHASE="user-purchase-channel"
+export const PUSHER_EVENT_PURCHASE="user-purchase-event"
+
 
 const ConnectPusher = ({
   userData,
   setUserData,
   order,
-  setOrder
+  setOrder,
+  finished,
+  setFinished,
+  purchaseOrder,
+  addItemToOrder,
+  menuItems
 }) => {
   const [connected, setConnected] = useState(false)
   const [pusher, setPusher] = useState(null)
@@ -21,6 +29,9 @@ const ConnectPusher = ({
 
   const [orderChannel, setOrderChannel] = useState(null)
   const [orderMessage, setOrderMessage] = useState(null)
+
+  const [purchaseChannel, setPurchaseChannel] = useState(null)
+  const [purchaseMessage, setPurchaseMessage] = useState(null)
 
   useEffect(() => {
     // connect pusher
@@ -38,6 +49,10 @@ const ConnectPusher = ({
     console.log('myorderchannel:', myorderchannel)
     setOrderChannel(myorderchannel)
 
+    const mypurchasechannel = mypusher.subscribe(PUSHER_CHANNEL_PURCHASE)
+    console.log('mypurchasechannel:', mypurchasechannel)
+    setPurchaseChannel(mypurchasechannel)
+
     setConnected(true)
 
     return () => {
@@ -49,6 +64,8 @@ const ConnectPusher = ({
       setMessage(null)
       setOrderChannel(null)
       setOrderMessage(null)
+      setPurchaseChannel(null)
+      setPurchaseMessage(null)
     }
   }, [])
 
@@ -70,11 +87,26 @@ const ConnectPusher = ({
       pusher.unsubscribe(orderChannel)
       orderChannel.bind(PUSHER_EVENT_ORDER, (data) => {
         console.log(`${PUSHER_EVENT_ORDER}:`, data)
+        console.log('dsfsdf')
         setOrderMessage(data.message)
-        setOrder([...order, data.order])
+        console.log(menuItems)
+        addItemToOrder(data.order)
       })
     }
   }, [orderChannel])
+
+  useEffect(() => {
+    if(purchaseChannel && !purchaseMessage) {
+      purchaseChannel.unbind()
+      pusher.unsubscribe(purchaseChannel)
+      purchaseChannel.bind(PUSHER_EVENT_PURCHASE, (data) => {
+        console.log(`${PUSHER_EVENT_PURCHASE}:`, data)
+        setPurchaseMessage(data.message)
+        setFinished(true)
+        purchaseOrder();
+      })
+    }
+  }, [purchaseChannel])
 
   const resetPusher = () => {
     if(channel) channel.unbind()
@@ -82,6 +114,9 @@ const ConnectPusher = ({
 
     if(orderChannel) orderChannel.unbind()
     if(pusher && orderChannel) pusher.unsubscribe(orderChannel)
+
+    if(purchaseChannel) purchaseChannel.unbind()
+    if(pusher && purchaseChannel) pusher.unsubscribe(purchaseChannel)
 
     if(pusher) pusher.disconnect()
   }
@@ -100,15 +135,20 @@ const ConnectPusher = ({
           </ul>
         </div>
       )}
-      {order && (
-        <div>
-          <p>order status: {orderMessage}</p>
+      {order && order.length > 0 && (
+        <div style={{marginBottom: 20}}>
+          <p>user&apos;s cart: {orderMessage}</p>
 
-          <ul>
+          {/* <ul>
             {Object.keys(order).map((key, index) => (
               <li key={index}>{key}: {order[key]}</li>
             ))}
-          </ul>
+          </ul> */}
+        </div>
+      )}
+      {purchaseChannel && (
+        <div>
+          <p>user progress: {finished ? "finished" : "in progress"}</p>
         </div>
       )}
     </section>

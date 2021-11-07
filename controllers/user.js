@@ -8,6 +8,9 @@ const PUSHER_EVENT="get-user-id"
 const PUSHER_CHANNEL_ORDER="user-order-channel"
 const PUSHER_EVENT_ORDER="user-order-event"
 
+const PUSHER_CHANNEL_PURCHASE="user-purchase-channel"
+const PUSHER_EVENT_PURCHASE="user-purchase-event"
+
 // create
 export const postUserHandler = async (req, res) => {
   console.log('user id:', req.body.userId);
@@ -395,7 +398,7 @@ export const postUserHistoryHandler = async (req, res) => {
       console.log('triggering event')
       pusher_result = await pusher.trigger(PUSHER_CHANNEL_ORDER, PUSHER_EVENT_ORDER, {
         message: "Added item to order",
-        order: newCart // array of strings
+        order: "3" // array of strings
       });
 
       // send back res
@@ -443,7 +446,7 @@ export const postUserHistoryHandler = async (req, res) => {
     // send event to menu ui
     pusher_result = await pusher.trigger(PUSHER_CHANNEL_ORDER, PUSHER_EVENT_ORDER, {
       message: "Added item to order",
-      order: newCart // array of strings
+      order: menuItem[0].id // array of strings
     });
 
     // send back res
@@ -481,6 +484,15 @@ export const postCheckoutHandler = async (req, res) => {
       message: 'userId is required'
     });
   }
+
+  // setup pusher
+  const pusher = new Pusher({
+    appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID,
+    key: process.env.NEXT_PUBLIC_PUSHER_KEY,
+    secret: process.env.PUSHER_SECRET,
+    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+    useTLS: true
+  });
 
   try {
     const result = await UserModel.find({id: userId});
@@ -529,6 +541,11 @@ export const postCheckoutHandler = async (req, res) => {
     const updated_user = await foundUser.save();
 
     console.log('updated user in postCheckout:', updated_user)
+
+    // trigger event
+    let pusher_result = await pusher.trigger(PUSHER_CHANNEL_PURCHASE, PUSHER_EVENT_PURCHASE, {
+      message: "Checkout complete",
+    });
 
     return res.status(200).send({
       ok: true,
