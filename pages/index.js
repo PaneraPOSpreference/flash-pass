@@ -115,6 +115,7 @@ export default function Home({
       setOrderFinished(false)
       setShowMenu(true)
       setUserData(null)
+      setMenuItems(mockMenuItems)
       // setLoading(false)
       // setErrors(null)
     }, 5000)
@@ -183,6 +184,7 @@ export default function Home({
           purchaseOrder={purchaseOrder}
           addItemToOrder={addItemToOrder}
           menuItems={menuItems}
+          setMenuItems={setMenuItems}
         />
         {(!orderFinished && order) && (
           <StyledMenuLayout>

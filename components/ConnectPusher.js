@@ -18,7 +18,8 @@ const ConnectPusher = ({
   finished,
   purchaseOrder,
   addItemToOrder,
-  menuItems
+  menuItems,
+  setMenuItems
 }) => {
   const [connected, setConnected] = useState(false)
   const [pusher, setPusher] = useState(null)
@@ -75,6 +76,12 @@ const ConnectPusher = ({
         console.log(`${PUSHER_EVENT}:`, data)
         setMessage(data.message)
         setUserData(data.userData)
+        // set menu items to reverse
+        let nextItems = [...menuItems]
+        nextItems.reverse();
+        setMenuItems(prevItems => ([
+          ...nextItems
+        ]))
       })
     }
   }, [channel])
