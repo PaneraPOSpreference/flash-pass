@@ -1,20 +1,20 @@
 import mongoose from 'mongoose'
-// import MenuItem from 'MenuItem'
+import { MenuSchema } from './Menu'
 
 const UserSchema = new mongoose.Schema({
-  name: { type: String, default: "" },
   id: { type: String },
-  // favorite: [
-  //   {
-  //     menuItem: {type: MenuItem}
-  //   }
-  // ],
-  // history: [
-  //   {
-  //     itemId: { type:  },
-  //     timestamp: { type: Date }
-  //   }
-  // ]
+  data: {
+    id: { type: String },
+    name: { type: String, default: "" },
+    frequent: MenuSchema
+  },
+  favorite: [ MenuSchema ],
+  history: [
+    {
+      menuItem: MenuSchema,
+      timestamp: { type: Date, default: Date.now() }
+    }
+  ]
 })
 
 export default mongoose.models.Users || mongoose.model('Users', UserSchema);
