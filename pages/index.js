@@ -141,6 +141,11 @@ export default function Home({
     setShowMenu(false)
     setOrder([])
 
+    setTimeout(() => {
+      setFinishedOrder(false)
+      setShowMenu(true)
+    }, 3000)
+
     // send api call
     // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
     //   method: "POST",
@@ -187,7 +192,7 @@ export default function Home({
       </Head>
 
       <main className={styles.main}>
-        <h1>Welcome to <Image src={logo} alt="flash pass logo" height={32} width={32} style={{width:100,height:100}} /> Flash Pass</h1>
+        <h1><Image src={logo} alt="flash pass logo" height={32} width={32} /> Bread Pass</h1>
         <ConnectPusher
           userData={userData}
           setUserData={setUserData}
@@ -199,10 +204,15 @@ export default function Home({
           addItemToOrder={addItemToOrder}
           menuItems={menuItems}
         />
-        <p>
+
+        <section style={{marginBottom:10}}>
+          <h4>Scan the QR Code on your phone for the full experience!</h4>
+        </section>
+
+        {/* <p>
           <label>Show Menu</label>
           <input type="checkbox" value={showMenu} onChange={(e) => setShowMenu(e.target.checked)} />
-        </p>
+        </p> */}
         {menuItems && menuItems.length && (menuItems.length > 0) && (
           <section className={classNames({"hidden": !showMenu})} style={{display: 'flex', flexWrap: "wrap", justifyContent: "space-evenly", marginBottom: 15}}>
             {menuItems.map((menuItem, index) => (
@@ -224,7 +234,7 @@ export default function Home({
 
         {!finishedOrder && order && (
           <div style={{width:"50%", margin: "0 auto", marginBottom: 80}}>
-            <h4 style={{textAlign:'center'}}>Your Order:</h4>
+            <h3 style={{textAlign:'center'}}>Your Order:</h3>
             {order.length > 0 && order.map((orderItem, index) => (
               <div className="order-item" key={`${index}-${orderItem.name}`} style={{marginBottom: 8,marginTop:8,borderBottom:"1px solid rgba(33,33,33,.1)", display:'flex',alignItems:'center', paddingLeft: 5, paddingRight: 5}}>
                 <button onClick={() => removeItemFromOrder(orderItem.id)} style={{marginRight:10,marginBottom:0}}>Remove</button>
@@ -256,12 +266,12 @@ export default function Home({
             <div className="item-body" >
               <h2 style={{textAlign:'center'}}>Thanks for shopping with us!</h2>
               <p style={{textAlign:'center'}}>We have added your order to your order history</p>
-              <button style={{textAlign:'center',display:'block',margin:"0 auto"}} onClick={() => orderAgain()}>Order Again</button>
+              {/* <button style={{textAlign:'center',display:'block',margin:"0 auto"}} onClick={() => orderAgain()}>Order Again</button> */}
             </div>
           </section>
         )}
 
-        {userData ? (
+        {userData && !finishedOrder && (
           <div>
             <h2>Welcome back, {userData.name || "Anon"}</h2>
             <section>
@@ -284,7 +294,8 @@ export default function Home({
               </ul>
             </section>
           </div>
-        ) : (
+        )}
+         {/* : !finishedOrder && (
           <form onSubmit={handleSubmit}>
             {loading && <p>Loading...</p>}
             {errors && <p style={{color: 'red', opacity: 0.8}}>{errors.toString()}</p>}
@@ -292,7 +303,7 @@ export default function Home({
             <input id="user-id" name="user-id" type="text" required value={userId} onChange={handleChange} />
             <button type="submit" disabled={loading}>Submit</button>
           </form>
-        )}
+        )} */}
       </main>
     </div>
   )

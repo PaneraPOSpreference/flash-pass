@@ -123,32 +123,10 @@ const ConnectPusher = ({
 
   return (
     <section>
-      <h4>Pusher: {(connected && pusher && channel) ? <span>Connected</span> : <span>Not Connected</span>}</h4>
-      {userData && (
-        <div style={{marginBottom: 20}}>
-          <p>user data status: {message}</p>
-
-          <ul>
-            {Object.keys(userData).map((key, index) => (
-              <li key={index}>{key}: {userData[key]}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {order && order.length > 0 && (
-        <div style={{marginBottom: 20}}>
-          <p>user&apos;s cart: {orderMessage}</p>
-
-          {/* <ul>
-            {Object.keys(order).map((key, index) => (
-              <li key={index}>{key}: {order[key]}</li>
-            ))}
-          </ul> */}
-        </div>
-      )}
       {purchaseChannel && (
         <div>
-          <p>user progress: {finished ? "finished" : "in progress"}</p>
+          <p style={{textAlign:'center',marginBottom:0,marginTop:0}}><small style={{textDecoration:"underline"}}>status</small></p>
+          <p style={{marginTop:8}}>{finished ? "Order finished" : "Order in progress"}</p>
         </div>
       )}
     </section>
