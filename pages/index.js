@@ -193,6 +193,7 @@ export default function Home({
                 <h4 className="menu-section-header fancy"><span>{menuData.categories[1]}</span></h4>
                 <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[1]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[1]}`}))} handleMenuItemClick={handleMenuItemClick} />
               </div>
+              <br />
               <div className="menu-section">
                 <h4 className="menu-section-header fancy"><span>{menuData.categories[2]}</span></h4>
                 <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[2]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[2]}`}))} handleMenuItemClick={handleMenuItemClick} />
@@ -203,7 +204,7 @@ export default function Home({
                 <h4 className="menu-section-header fancy fancy-2"><span>{menuData.categories[0]}</span></h4>
                 <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[0]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[0]}`}))} handleMenuItemClick={handleMenuItemClick} />
               </div>
-
+              <br />
               {/* Order Window */}
               <StyledOrders>
                 <h3 className="orders-header">{userData ? `Welcome back, ${userData.name || "Guest"}` : "Your Order:"}</h3>
@@ -239,6 +240,7 @@ export default function Home({
                 <h4 className="menu-section-header fancy"><span>{menuData.categories[3]}</span></h4>
                 <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[3]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[3]}`}))} handleMenuItemClick={handleMenuItemClick} />
               </div>
+              <br />
               <div className="menu-section">
                 <h4 className="menu-section-header fancy"><span>{menuData.categories[4]}</span></h4>
                 <ItemsGridSection menuItems={menuItems.filter(item => item.category === menuData.categories[4]).map(item => ({...item, imageSrc: `/panera-images/${menuData.imageSources[4]}`}))} handleMenuItemClick={handleMenuItemClick} />
