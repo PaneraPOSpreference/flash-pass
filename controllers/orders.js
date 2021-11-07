@@ -127,7 +127,7 @@ export const postUserCartHandler = async (req, res) => {
     // send event to menu ui
     pusher_result = await pusher.trigger(PUSHER_CHANNEL_ORDER, PUSHER_EVENT_ORDER, {
       message: "Added item to order",
-      order: menuItem[0] // array of menu items
+      order: menuItem[0].id // array of menu items
     });
 
     // send back res
