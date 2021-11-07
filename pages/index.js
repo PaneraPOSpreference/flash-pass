@@ -82,6 +82,27 @@ export default function Home({
     console.log('adding item with id:', itemId, 'to order')
     const item = menuItems.find(item => item.id === itemId)
     setOrder([...order, item])
+
+    // api call
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/orders/add`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        userId,
+        itemId
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('added item to order data:', data)
+      })
+      .catch(err => {
+        console.log(err)
+        setErrors(err)
+      })
   }
 
   const removeItemFromOrder = (itemId) => {
@@ -93,11 +114,33 @@ export default function Home({
   const purchaseOrder = () => {
     console.log('purchasing order')
 
+    const orderIds = order.map(item => item.id)
 
 
     setFinishedOrder(true)
     setShowMenu(false)
     setOrder([])
+
+    // send api call
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        userId,
+        order: orderIds // string of ids
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('purchased order data:', data)
+      })
+      .catch(err => {
+        console.log(err)
+        setErrors(err)
+      })
   }
 
   const orderAgain = () => {
@@ -142,8 +185,6 @@ export default function Home({
             ))}
           </section>
         )}
-
-
 
         {showMenu && activeMenuItemId && (
           <div style={{cursor: "pointer", marginBottom: 30}}>
