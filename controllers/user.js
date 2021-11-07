@@ -53,7 +53,7 @@ export const postUserHandler = async (req, res) => {
     
     let pusher_result;
     if(!result || result.length === 0) {
-      const User = new UserModel({id: userId});
+      const User = new UserModel({id: userId, name: "Anon"});
       const save_result = await User.save();
       // before sending, trigger pusher
       if(!skipPusher) {
@@ -68,7 +68,10 @@ export const postUserHandler = async (req, res) => {
       return res.status(201).send({
         ok: true,
         message: "Created a new user successfully",
-        data: save_result.data.length ? save_result.data[0] : save_result.data
+        data: {
+          id: userId,
+          name: "Anon"
+        }
       })
     }
 
@@ -82,10 +85,15 @@ export const postUserHandler = async (req, res) => {
       });
     }
 
+    const output = result.length ? result[0] : result
+    console.log("output:",output)
     return res.status(200).send({
       ok: true,
       message: "userID received",
-      data: result.length ? result[0] : result
+      data: {
+        id: output.id,
+        name: output.data.name
+      }
     });
 
   } catch(error) {
