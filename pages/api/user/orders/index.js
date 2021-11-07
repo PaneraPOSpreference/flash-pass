@@ -1,8 +1,6 @@
 import connectDB from '../../../../middleware/mongodb'
-import {
-  getUserHistoryHandler,
-  postCheckoutHandler
-} from '../../../../controllers/user'
+import { postCheckoutHandler } from '../../../../controllers/orders'
+import { getUserHistoryHandler } from '../../../../controllers/user'
 import NextCors from 'nextjs-cors'
 
 const userHandler = async (req, res) => {
