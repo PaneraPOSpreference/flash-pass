@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
@@ -9,11 +9,27 @@ const testUserId = "dsfafdf"
 
 export default function Home({
   userData,
-  setUserData
+  setUserData,
+  menuItems,
+  setMenuItems,
 }) {
   const [userId, setUserId] = useState(testUserId || "")
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState(null)
+
+  useEffect(() => {
+    // fetch menuItems
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/menu`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('data:', data)
+        setMenuItems(data)
+      })
+      .catch(err => {
+        console.log('err:', err)
+        setErrors(err)
+      })
+  }, [])
 
   const handleChange = e => {
     setUserId(e.target.value)

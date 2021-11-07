@@ -31,4 +31,3 @@ export const getMenuHandler = async (req, res) => {
     })
   }
 }
-

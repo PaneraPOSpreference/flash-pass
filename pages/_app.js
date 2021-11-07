@@ -38,12 +38,15 @@ export const ordersMock = {
 
 function MyApp({ Component, pageProps }) {
   const [userData, setUserData] = useState(null)
+  const [menuItems, setMenuItems] = useState(null)
 
   return (
     <Component
       {...pageProps}
       userData={userData}
-      setUserData={setUserData}  
+      setUserData={setUserData}
+      menuItems={menuItems}
+      setMenuItems={setMenuItems}
     />
   )
 }
