@@ -80,29 +80,32 @@ export default function Home({
 
   const addItemToOrder = (itemId) => {
     console.log('adding item with id:', itemId, 'to order')
+
+
+
     const item = menuItems.find(item => item.id === itemId)
     setOrder([...order, item])
 
     // api call
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/orders/add`, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        userId,
-        itemId
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log('added item to order data:', data)
-      })
-      .catch(err => {
-        console.log(err)
-        setErrors(err)
-      })
+    // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/orders/add`, {
+    //   method: "POST",
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Accept': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     userId,
+    //     itemId
+    //   })
+    // })
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     console.log('added item to order data:', data)
+    //   })
+    //   .catch(err => {
+    //     console.log(err)
+    //     setErrors(err)
+    //   })
   }
 
   const removeItemFromOrder = (itemId) => {
@@ -168,7 +171,12 @@ export default function Home({
 
       <main className={styles.main}>
         <h1>Welcome to <Image src={logo} alt="flash pass logo" height={32} width={32} style={{width:100,height:100}} /> Flash Pass</h1>
-        <ConnectPusher userData={userData} setUserData={setUserData} />
+        <ConnectPusher
+          userData={userData}
+          setUserData={setUserData}
+          order={order}
+          setOrder={setOrder}
+        />
         <p>
           <label>Show Menu</label>
           <input type="checkbox" value={showMenu} onChange={(e) => setShowMenu(e.target.checked)} />

@@ -5,6 +5,9 @@ import Pusher from "pusher"
 const PUSHER_CHANNEL="user-id-channel"
 const PUSHER_EVENT="get-user-id"
 
+const PUSHER_CHANNEL_ORDER="user-order-channel"
+const PUSHER_EVENT_ORDER="user-order-event"
+
 // create
 export const postUserHandler = async (req, res) => {
   console.log('user id:', req.body.userId);
@@ -326,6 +329,15 @@ export const postUserHistoryHandler = async (req, res) => {
     });
   }
 
+  // setup Pusher
+  const pusher = new Pusher({
+    appId: process.env.NEXT_PUBLIC_PUSHER_APP_ID,
+    key: process.env.NEXT_PUBLIC_PUSHER_KEY,
+    secret: process.env.PUSHER_SECRET,
+    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+    useTLS: true
+  });
+
   try {
     const result = await UserModel.find({id: userId});
 
@@ -346,7 +358,7 @@ export const postUserHistoryHandler = async (req, res) => {
     const menuItem = await MenuModel.find({id: Number(itemId)})
     console.log('menu item:', menuItem)
 
-    let foundCart, newCart;
+    let foundCart, newCart, pusher_result;
     if(!menuItem || menuItem.length == 0) {
       foundCart = (Array.isArray(foundUser.cart)) ? foundUser.cart : []
       newCart = [...foundCart, "3"]
@@ -380,7 +392,11 @@ export const postUserHistoryHandler = async (req, res) => {
       // console.log("updated user:", temp_save_user)
 
       // send event to menu ui
-
+      console.log('triggering event')
+      pusher_result = await pusher.trigger(PUSHER_CHANNEL_ORDER, PUSHER_EVENT_ORDER, {
+        message: "Added item to order",
+        order: newCart // array of strings
+      });
 
       // send back res
       return res.status(200).send({
@@ -423,7 +439,12 @@ export const postUserHistoryHandler = async (req, res) => {
 
     // console.log("updated user:", newUser)
 
+    console.log('triggering event 2')
     // send event to menu ui
+    pusher_result = await pusher.trigger(PUSHER_CHANNEL_ORDER, PUSHER_EVENT_ORDER, {
+      message: "Added item to order",
+      order: newCart // array of strings
+    });
 
     // send back res
     return res.status(200).send({
