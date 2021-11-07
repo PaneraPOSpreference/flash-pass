@@ -36,4 +36,6 @@ a {
 .title-text {
   font-family: "panera";
   font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }

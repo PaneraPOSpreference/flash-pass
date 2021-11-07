@@ -6,3 +6,5 @@ export const colors = {
   brown: "#3c1c00",
   gray: "#272A2D"
 }
+
+export default colors

@@ -1,6 +1,7 @@
 export const menu = {
   categories: ["Flatbreads", "Sandwhiches", "Salads", "Soups", "Bakery"],
-  types: ["Breakfast", "Lunch", "Dinner", "any"]
+  types: ["Breakfast", "Lunch", "Dinner", "any"],
+  imageSources: ["flatbread-1.jpg", "sandwhich-1.jpg", "salad-1.jpg", "soup-1.jpg", "bagel-1.jpg"]
 }
 
 export const menuItems = [
