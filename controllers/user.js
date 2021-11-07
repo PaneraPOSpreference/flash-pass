@@ -341,22 +341,22 @@ export const postUserHistoryHandler = async (req, res) => {
       return res.status(200).send({
         ok: true,
         message: "couldnt find that item but whatever",
-        data: {
+        data: [{
           itemId: itemId,
           name: "None",
           price: 9.99
-        }
+        }]
       })
     }
 
     return res.status(200).send({
       ok: true,
       message: "user found, here is the history",
-      data: {
+      data: [{
         itemId: menuItem[0].id,
         name: menuItem[0].name,
         price: menuItem[0].price
-      }
+      }]
     });
 
   } catch(error) {
