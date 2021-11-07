@@ -1,7 +1,7 @@
-import connectDB from '../../../middleware/mongodb'
+import connectDB from '../../../../middleware/mongodb'
 import {
   getUserHistoryHandler
-} from '../../../controllers/user'
+} from '../../../../controllers/user'
 import NextCors from 'nextjs-cors'
 
 const userHandler = async (req, res) => {
