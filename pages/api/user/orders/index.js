@@ -16,7 +16,7 @@ const userHandler = async (req, res) => {
     case "GET":
       return getUserHistoryHandler(req, res);
     case "POST":
-      return completePurchaseHandler(req, res);
+      return postPurchaseHandler(req, res);
     default:
       return res.status(400).send({ok: false, message: "Request type not supported"})
   }
