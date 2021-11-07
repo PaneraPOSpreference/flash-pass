@@ -92,7 +92,7 @@ export const postUserHandler = async (req, res) => {
       message: "userID received",
       data: [{
         id: output.id,
-        name: output.data.name
+        name: (output.data.name === "")?"Anon":output.data.name
       }]
     });
 
