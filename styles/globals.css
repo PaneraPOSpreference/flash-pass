@@ -1,8 +1,17 @@
+@font-face {
+  font-family: 'panera';
+  src: url("/fonts/panera.ttf");
+}
+@font-face {
+  font-family: 'roboto-medium';
+  src: url("/fonts/Roboto-Medium.ttf");
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+  font-family: -apple-system, "roboto-medium", BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
@@ -23,4 +32,8 @@ a {
 }
 .hidden {
   display: none !important;
+}
+.title-text {
+  font-family: "panera";
+  font-weight: 500;
 }

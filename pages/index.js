@@ -184,13 +184,13 @@ export default function Home({
   return (
     <div className={styles.container}>
       <Head>
-        <title>Flash Pass | Tiger Hacks 2021</title>
+        <title>Bread Pass | Tiger Hacks 2021</title>
         <meta name="description" content="Order your favorite panera items more easily than ever!" />
         <link rel="icon" href="/logo.svg" />
       </Head>
 
       <main className={styles.main}>
-        <h1><Image src={logo} alt="flash pass logo" height={32} width={32} /> Bread Pass</h1>
+        <h1 className="title-text"><Image src={logo} alt="flash pass logo" height={32} width={32} /> Bread Pass</h1>
         <ConnectPusher
           userData={userData}
           setUserData={setUserData}
@@ -204,7 +204,7 @@ export default function Home({
         />
 
         <section style={{marginBottom:10}}>
-          <h4>Scan the QR Code on your phone for the full experience!</h4>
+          <h4>Scan the QR Code on our mobile app for the full experience!</h4>
         </section>
 
         {/* <p>
