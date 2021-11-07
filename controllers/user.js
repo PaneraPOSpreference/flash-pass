@@ -141,6 +141,7 @@ export const putUserHandler = async (req, res) => {
     // add account
     let data = {
       ...req.body,
+      name: req.body.name,
       data: {
         id:(req.body).userId,
         name:(req.body).name
@@ -303,17 +304,25 @@ export const getUserHistoryHandler = async (req, res) => {
   }
 }
 
-// return menu item
+// adding new menu item to user.cart
 export const postUserHistoryHandler = async (req, res) => {
-  console.log('user id:', req.body.userId);
+  console.log('user ipostCheckoutd:', req.body.userId);
 
   let userId = req.body.userId;
+  let itemId = req.body.itemId;
 
   if(!userId) {
     // send error
     return res.status(400).send({
       ok: false,
       message: 'userId is required'
+    });
+  }
+  if(!itemId) {
+    // send error
+    return res.status(400).send({
+      ok: false,
+      message: 'itemId is required'
     });
   }
 
@@ -332,23 +341,91 @@ export const postUserHistoryHandler = async (req, res) => {
 
     const foundUser = result[0]
 
-    let itemId = req.body.itemId
-    console.log('item id:', itemId)
+    console.log('found user:', foundUser)
+
     const menuItem = await MenuModel.find({id: Number(itemId)})
     console.log('menu item:', menuItem)
 
+    let foundCart, newCart;
     if(!menuItem || menuItem.length == 0) {
+      foundCart = (Array.isArray(foundUser.cart)) ? foundUser.cart : []
+      newCart = [...foundCart, "3"]
+      console.log("new cart:", newCart)
+      // foundUser.cart = newCart;
+      // console.log('found user:', foundUser)
+
+      UserModel.updateOne(
+        {id: userId}, 
+        {cart : newCart },
+        {multi:false}, 
+          function(err, numberAffected){
+            if(err) {
+              console.log('error updating:', err)
+              return;
+            }  
+            console.log('success updated user times:', numberAffected)
+          });   
+        
+
+      // add menu item to foundUser
+      // let data = {
+      //   cart: [...foundCart, "3"] //(!foundUser.cart || !foundUser.cart.length) ? [] : foundUser.cart
+      // }
+      // console.log("data:", data)
+      // // data.cart.push("3")
+      // foundUser.set(data)
+  
+      // let temp_save_user = await foundUser.save();
+  
+      // console.log("updated user:", temp_save_user)
+
+      // send event to menu ui
+
+
+      // send back res
       return res.status(200).send({
         ok: true,
         message: "couldnt find that item but whatever",
         data: [{
-          itemId: itemId,
+          itemId: "3",
           name: "None",
-          price: 9.99
+          price: "9.99"
         }]
       })
     }
 
+    foundCart = (Array.isArray(foundUser.cart)) ? foundUser.cart : []
+    newCart = [...foundCart, menuItem[0].id]
+    console.log("new cart:", newCart)
+
+    UserModel.updateOne(
+      {id: userId}, 
+      {cart : newCart },
+      {multi:false}, 
+        function(err, numberAffected){
+          if(err) {
+            console.log('error updating:', err)
+            return;
+          }  
+          console.log('success updated user times:', numberAffected)
+        });
+
+    // add menuItem.id to foundUser's array of item ids in foundUser.cart
+      // if foundUser.cart is undefined, initialize it with an empty array, then add the id
+    // let data = {
+    //   cart: (!foundUser.cart || !foundUser.length) ? [] : foundUser.cart
+    // }
+    // console.log('menu item:', menuItem)
+    // data.cart.push(menuItem.id)
+    // foundUser.set(data)
+
+    // const newUser = await foundUser.save();
+
+    // console.log("updated user:", newUser)
+
+    // send event to menu ui
+
+    // send back res
     return res.status(200).send({
       ok: true,
       message: "user found, here is the history",
@@ -369,8 +446,9 @@ export const postUserHistoryHandler = async (req, res) => {
   }
 }
 
-// add user history
-export const postUserHistoryHandler = async (req, res) => {
+// move cart to history
+// simulate purchase, send user.cart items to user.history, clear user.cart, return nothing but a message
+export const postCheckoutHandler = async (req, res) => {
   console.log('user id:', req.body.userId);
 
   let userId = req.body.userId;
@@ -397,39 +475,51 @@ export const postUserHistoryHandler = async (req, res) => {
     }
 
     const foundUser = result[0]
-    const history = foundUser.history
 
-    let itemId = req.body.itemId
-    console.log('item id:', itemId)
-    const menuItem = await MenuModel.find({id: Number(itemId)})
-    console.log('menu item:', menuItem)
-
-    if(!menuItem || menuItem.length == 0) {
-      return res.status(200).send({
-        ok: true,
-        message: "couldnt find that item but whatever",
-        data: {
-          itemId: itemId,
-          name: "None",
-          price: 9.99
-        }
-      })
+    const oldCart = foundUser.cart    
+    
+    // update user
+    let data = {
+      history: (!foundUser.history || foundUser.history.length === 0) ? [] : foundUser.history
     }
+    data.history.push(oldCart)
 
-    const newHistory = history.concat(menuItem)
+    // save user with new order in history
+    foundUser.set(data)
+  
+    const newUser = await foundUser.save();
+
+    console.log("updated user:", newUser)
+
+    // clear cart
+    // get cart items from user
+    console.log('user cart:', foundUser.cart)
+
+    // sent cart items to user
+
+
+    // clear cart
+    data = {
+      cart: []
+    }
+    // update user
+    foundUser.set(data)
+  
+    const updated_user = await foundUser.save();
+
+    console.log('updated user in postCheckout:', updated_user)
 
     return res.status(200).send({
       ok: true,
-      message: "user found, here is the history",
-      data: newHistory
+      message: "Purchase has been completed",
     });
 
   } catch(error) {
-    console.log("mongoose error:", error);
+    console.log("purchase error:", error);
 
     return res.status(400).send({
       ok: false,
-      message: "Error getting user: " + error.message
+      message: "Error purchasing user order: "//error.message
     })
   }
 }
