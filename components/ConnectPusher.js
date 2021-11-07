@@ -15,10 +15,7 @@ export const PUSHER_EVENT_PURCHASE="user-purchase-event"
 const ConnectPusher = ({
   userData,
   setUserData,
-  order,
-  setOrder,
   finished,
-  setFinished,
   purchaseOrder,
   addItemToOrder,
   menuItems
@@ -103,7 +100,6 @@ const ConnectPusher = ({
       purchaseChannel.bind(PUSHER_EVENT_PURCHASE, (data) => {
         console.log(`${PUSHER_EVENT_PURCHASE}:`, data)
         setPurchaseMessage(data.message)
-        setFinished(true)
         purchaseOrder();
       })
     }

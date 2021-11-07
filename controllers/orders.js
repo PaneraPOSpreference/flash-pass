@@ -190,7 +190,7 @@ export const postCheckoutHandler = async (req, res) => {
 
     const foundUser = result[0]
     const oldCart = (!foundUser.cart || foundUser.cart.length === 0) ? [] : foundUser.cart
-    const price = (oldCart == []) ? 0 : oldCart.reduce((prev,curr) => (prev+curr),0)
+    const price = (!Array.isArray(oldCart) || oldCart.length === 0) ? 0 : oldCart.reduce((prev,curr) => (prev+Number(curr.price)),0)
     console.log("Price:",price)
 
     let ordersLen = (!foundUser.history || foundUser.history.length === 0) ? 0 : foundUser.history.length

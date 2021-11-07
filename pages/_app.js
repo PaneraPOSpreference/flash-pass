@@ -1,21 +1,23 @@
 import '../styles/globals.css'
-import { useState } from 'react'
+import { RecoilRoot } from "recoil";
 
 function MyApp({ Component, pageProps }) {
   
 
   return (
-    <Component
-      {...pageProps}
-      // userData={userData}
-      // setUserData={setUserData}
-      // menuItems={menuItems}
-      // setMenuItems={setMenuItems}
-      // order={order}
-      // cart={cart}
-      // setCart={setCart}
-      // setOrder={setOrder}
-    />
+    <RecoilRoot>
+      <Component
+        {...pageProps}
+        // userData={userData}
+        // setUserData={setUserData}
+        // menuItems={menuItems}
+        // setMenuItems={setMenuItems}
+        // order={order}
+        // cart={cart}
+        // setCart={setCart}
+        // setOrder={setOrder}
+      />
+    </RecoilRoot>
   )
 }
 

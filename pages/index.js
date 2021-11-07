@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 // import classNames from "classnames"
+import { useRecoilState } from 'recoil'
 import styled from 'styled-components'
 import styles from '../styles/Home.module.css'
 import logo from '../public/logo.svg'
@@ -9,8 +10,9 @@ import ConnectPusher from '../components/ConnectPusher'
 import {menuItems as mockMenuItems, menu as menuData} from '../mocks/menu'
 import { ItemsGridSection } from '../components/ItemsGridSection'
 import colors from '../styles/colors'
+import {userDataState, menuItemsState, orderState, orderFinishedState} from '../components/atoms'
 
-const testUserId = "dsfafdf"
+// const testUserId = "dsfafdf"
 
 export default function Home({
   // userData,
@@ -22,17 +24,16 @@ export default function Home({
   // cart,
   // setCart
 }) {
-  const [userData, setUserData] = useState(null)
-  const [menuItems, setMenuItems] = useState(mockMenuItems)
-  const [order, setOrder] = useState([])
-  const [cart, setCart] = useState([])
+  const [userData, setUserData] = useRecoilState(userDataState)
+  const [menuItems, setMenuItems] = useRecoilState(menuItemsState)
+  const [order, setOrder] = useRecoilState(orderState)
+  const [orderFinished, setOrderFinished] = useRecoilState(orderFinishedState)
 
-  const [userId, setUserId] = useState(testUserId || "")
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState(null)
+  // const [loading, setLoading] = useState(false)
+  // const [errors, setErrors] = useState(null)
   const [activeMenuItemId, setActiveMenuItemId] = useState(null)
   const [showMenu, setShowMenu] = useState(true)
-  const [finishedOrder, setFinishedOrder] = useState(false)
+  // const [finishedOrder, setFinishedOrder] = useState(false)
 
   // let categories = menuData.categories;
 
@@ -53,11 +54,9 @@ export default function Home({
     // insert "order" into 4th position of categories
     // let nextCategories = categories.splice(3, 0, "order")
     // console.log('nextCategories:', nextCategories, 'categories:', categories)
-  }, [])
-
-  useEffect(() => {
-    console.log('menu items change:', menuItems)
-  }, [menuItems])
+    console.log('order:', order)
+    console.log('userData.orders:', userData?.orders)
+  }, [order, userData])
 
   const handleMenuItemClick = (menuItemId) => {
     console.log(menuItemId)
@@ -70,13 +69,10 @@ export default function Home({
   const addItemToOrder = (itemId) => {
     console.log('adding item with id:', itemId, 'to order')
 
-    console.log('prev order:', order)
     console.log('menu items:', menuItems)
     const item = menuItems.find(item_r => item_r.id === itemId)
     console.log('order item:', item)
-    setOrder(prevOrder => ([...prevOrder, item]))
-
-    console.log('next order:', order)
+    setOrder(prev =>([...prev, item]))
 
     // api call
     // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/orders/add`, {
@@ -109,15 +105,18 @@ export default function Home({
   const purchaseOrder = () => {
     console.log('purchasing order')
 
-    setFinishedOrder(true)
+    setOrderFinished(true)
     setShowMenu(false)
 
     console.log('order:', order)
 
     setTimeout(() => {
       setOrder([])
-      setFinishedOrder(false)
+      setOrderFinished(false)
       setShowMenu(true)
+      setUserData(null)
+      // setLoading(false)
+      // setErrors(null)
     }, 5000)
 
     // send api call
@@ -148,14 +147,24 @@ export default function Home({
   //   setActiveMenuItemId(null)
   // }
 
-  // const clearUser = () => {
-  //   setUserData(null)
-  //   setLoading(false)
-  //   setErrors(null)
-  //   setActiveMenuItemId(null)
-  //   setUserId("")
-  //   setFinishedOrder(false)
-  // }
+  const formatDate = (dateSource) => {
+    if(!dateSource) return "na"
+    const date = new Date(dateSource);
+    let day = date.getDate(); // day (numeric)
+    let month = date.getMonth() // month (numeric?)
+
+    let hh = date.getHours();
+    let mm = date.getMinutes();
+
+    let hh_str = hh.toString();
+    let mm_str = mm.toString();
+    if(hh < 10)
+      hh_str = "0" + hh.toString()
+    if(mm < 10)
+      mm_str = "0" + mm.toString()
+
+    return `${month}/${day} ${hh_str}:${mm_str}`
+  }
 
   return (
     <div className={styles.container}>
@@ -170,15 +179,12 @@ export default function Home({
         <ConnectPusher
           userData={userData}
           setUserData={setUserData}
-          order={order}
-          setOrder={setOrder}
-          finished={finishedOrder}
-          setFinished={setFinishedOrder}
+          finished={orderFinished}
           purchaseOrder={purchaseOrder}
           addItemToOrder={addItemToOrder}
           menuItems={menuItems}
         />
-        {(!finishedOrder && order) && (
+        {(!orderFinished && order) && (
           <StyledMenuLayout>
             <div className="left-col">
               <div className="menu-section">
@@ -199,18 +205,30 @@ export default function Home({
               {/* Order Window */}
               <StyledOrders>
                 <h3 className="orders-header">{userData ? `Welcome back, ${userData.name || "Guest"}` : "Your Order:"}</h3>
-                <ul className="orders-list">
-                  {order.length > 0 && order.map((orderItem, index) => (
-                    <li className="order-item" key={`${index}-${orderItem.name}`}>
-                      <h4 className="order-item-text">#{orderItem.id} - {orderItem.name}</h4>
-                      <p className="order-item-price">${orderItem.price.toString()}</p>
+                {userData?.orders?.length > 0 && (
+                  <div className="orders-history">
+                    <h4 style={{margin:0}}>Your Past Orders</h4>
+                    {userData.orders.map((pastOrder, index) => (
+                      <div className="orders-history-item" key={`${index}-${pastOrder?.id}`}>
+                        <h4 style={{fontWeight:400}}><span style={{opacity:0.7}}>{formatDate(pastOrder?.timestamp?.end)}</span> - {pastOrder?.items.map(pastItem => <span key={`${pastItem.id}-${pastItem.price}-${index}`}>#{pastItem.id}, </span>)}</h4>
+                        <h4 style={{fontWeight:400}}>${pastOrder?.price}</h4>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <ul className="orders-list" style={{marginTop:40}}>
+                  {/* <h2 style={{margin:0}}>Your Order</h2> */}
+                  {order?.length > 0 && order.map((orderItem, index) => (
+                    <li className="order-item" key={`${index}-${orderItem?.name}-${orderItem?.id}`}>
+                      <h4 className="order-item-text">#{orderItem?.id} - {orderItem?.name}</h4>
+                      <p className="order-item-price">${orderItem?.price.toString()}</p>
                     </li>
                   ))}
                 </ul>
     
                 <div className="total-container">
                   <h4 style={{marginBottom:0,marginTop:0, marginRight: 20}}>Total:</h4>
-                  <h4 style={{marginBottom:0,marginTop:0}}>${order.length < 0 ? 0 : order.reduce((acc, curr) => acc + Number(curr.price), 0)}</h4>
+                  <h4 style={{marginBottom:0,marginTop:0}}>${order?.length === 0 ? 0 : order.reduce((acc, curr) => (acc + Number(curr?.price)), 0)}</h4>
                 </div>
               </StyledOrders>
             </div>
@@ -233,7 +251,7 @@ export default function Home({
           </div>
         )}
 
-        {finishedOrder && (
+        {orderFinished && (
           <section style={{padding: 20, border: "1px solid rgba(0,0,0,.15)", width: "75%", margin: "20px auto", display:'flex', alignItems:'center',justifyContent:'center',marginBottom:40}}>
             <div className="icon-container" style={{display:'flex',alignItems:'center',justifyContent:'center',paddingRight:30}}>
               <Image src={logo} alt="flash pass logo" width={50} height={50} />
@@ -256,22 +274,22 @@ export default function Home({
           </section>
         )}
 
-        {userData && !finishedOrder && (
+        {/* {userData && !finishedOrder && (
           <div>
             
             <section>
               <p>Your order history:</p>
               <OrdersHistory>
-                {userData.orders?.map(order => (
-                  <li key={order.id}>
-                    <p>{order.items.map(item => item.name).join(", ")}</p>
-                    <p>{order.total}</p>
+                {userData.orders?.map(orderItem => (
+                  <li key={orderItem.id}>
+                    <p>{orderItem.items.map(item => item.name).join(", ")}</p>
+                    <p>{orderItem.total}</p>
                   </li>
                 ))}
               </OrdersHistory>
             </section>
           </div>
-        )}
+        )} */}
       </main>
     </div>
   )
@@ -284,6 +302,28 @@ const StyledOrders = styled.section`
   padding-left: 10%;
   padding-right: 10%;
 
+  .orders-history {
+    /* border: 1px solid rgba(76, 117, 63, 0.5); */
+    border-bottom: 1px solid rgba(76, 117, 63, 0.5);
+    /* border-radius: 5px; */
+    padding: 5px;
+  }
+  .orders-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(76, 117, 63, 0.5);
+
+    &:last-child{
+      border-bottom: none;
+    }
+
+    h4 {
+      margin: 0px;
+      padding: 0px;
+    }
+  }
   .orders-header {
     text-align:center;
     font-size:1.75rem;
@@ -407,16 +447,23 @@ const StyledMenuLayout = styled.div`
     }
   }
 
-  @media (min-width: 300px) {
-    grid-template-columns: repeat(1, 1fr);
-  }
-
   @media (min-width: 600px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @media (min-width: 900px) {
-    grid-template-columns: repeat(3, 1fr);
+  @media (max-width: 768px) {
+    .left-col {
+      float: none;
+      width: 100%;
+    }
+    .mid-col {
+      float: none;
+      width: 100%;
+    }
+    .right-col {
+      float: none;
+      width: 100%;
+    }
   }
 
   @media (min-width: 1200px) {
