@@ -2,10 +2,8 @@ import mongoose from 'mongoose'
 
 export const MenuSchema = new mongoose.Schema({
   name: { type: String },
-  id: { type: String },
-  type: [
-    { type: String }
-  ],
+  id: { type: Number },
+  type: [ String ],
   category: { type: String },
   price: { type: String }
 })
