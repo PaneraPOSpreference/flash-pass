@@ -62,6 +62,7 @@ export const postUserHandler = async (req, res) => {
           message: "Created new user",
           userData: {
             id:userId,
+            name: "Anon"
           }
         });
       }
@@ -76,16 +77,18 @@ export const postUserHandler = async (req, res) => {
       })
     }
 
+    const foundUser = result[0];
+
     // before sending, trigger pusher
     if(!skipPusher) {
       pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
         message: "Found the user",
         userData: {
           id: userId,
-          name: result.data?.name || result.name,
-          frequent: result.data?.frequent || result.frequent,
-          favs: result.favorite,
-          orders: result.history
+          name: foundUser.data?.name || foundUser.name,
+          frequent: foundUser.data?.frequent || foundUser.frequent,
+          favs: foundUser.favorite,
+          orders: foundUser.history
         }
       })
     }
@@ -93,7 +96,6 @@ export const postUserHandler = async (req, res) => {
     const output = result.length ? result[0] : result
     console.log("output:",output)
 
-    const foundUser = result[0]
     let ordersLen = (!foundUser.history || foundUser.history.length === 0) ? 0 : foundUser.history.length
 
     // create order object to update user history with
