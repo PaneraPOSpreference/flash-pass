@@ -72,7 +72,7 @@ export default function Home({
 
     console.log('prev order:', order)
     console.log('menu items:', menuItems)
-    const item = menuItems.find(item => item.id === itemId)
+    const item = menuItems.find(item_r => item_r.id === itemId)
     console.log('order item:', item)
     setOrder(prevOrder => ([...prevOrder, item]))
 
