@@ -54,7 +54,6 @@ export const postUserHandler = async (req, res) => {
     if(!result || result.length === 0) {
       const User = new UserModel({id: userId});
       const save_result = await User.save();
-      console.log('result:', save_result)
       // before sending, trigger pusher
       if(!skipPusher) {
         pusher_result = await pusher.trigger(PUSHER_CHANNEL, PUSHER_EVENT, {
@@ -64,7 +63,7 @@ export const postUserHandler = async (req, res) => {
           }
         });
       }
-      console.log('pusher result:', pusher_result)
+
       return res.status(201).send({
         ok: true,
         message: "Created a new user successfully",
@@ -83,7 +82,6 @@ export const postUserHandler = async (req, res) => {
         }
       });
     }
-    console.log('pusher result:', pusher_result)
 
     return res.status(200).send({
       ok: true,
