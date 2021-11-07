@@ -197,7 +197,7 @@ export const postCheckoutHandler = async (req, res) => {
 
     // create order object to update user history with
     let newOrder = new OrderModel({
-      items: new MenuModel({...oldCart}),
+      items: oldCart,
       price: price,
       timestamp: {
         start: Date.now().toString(),
