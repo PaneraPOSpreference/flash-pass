@@ -49,9 +49,9 @@ const ConnectPusher = ({
   }, [channel])
 
   const resetPusher = () => {
-    channel.unbind()
-    pusher.unsubscribe(channel)
-    pusher.disconnect()
+    if(channel) channel.unbind()
+    if(pusher && channel) pusher.unsubscribe(channel)
+    if(pusher) pusher.disconnect()
   }
 
   return (
