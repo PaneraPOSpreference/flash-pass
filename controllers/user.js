@@ -68,10 +68,10 @@ export const postUserHandler = async (req, res) => {
       return res.status(201).send({
         ok: true,
         message: "Created a new user successfully",
-        data: {
+        data: [{
           id: userId,
           name: "Anon"
-        }
+        }]
       })
     }
 
@@ -90,10 +90,10 @@ export const postUserHandler = async (req, res) => {
     return res.status(200).send({
       ok: true,
       message: "userID received",
-      data: {
+      data: [{
         id: output.id,
         name: output.data.name
-      }
+      }]
     });
 
   } catch(error) {
